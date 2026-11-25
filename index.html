@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PragatiSetu — Daily DPR Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+:root{
+  --navy:#0f172a; --navy2:#1e293b; --navy3:#334155;
+  --accent:#f59e0b; --accent-d:#d97706;
+  --blue:#2563eb; --blue-l:#dbeafe;
+  --bg:#f1f5f9; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+  --border:#e2e8f0; --ok:#059669; --ok-l:#d1fae5; --danger:#dc2626; --danger-l:#fee2e2;
+  --shadow:0 1px 3px rgba(15,23,42,.08),0 1px 2px rgba(15,23,42,.06);
+  --shadow-l:0 10px 30px rgba(15,23,42,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,select,textarea{font-family:inherit;font-size:14px}
+a{color:var(--blue)}
+.hidden{display:none!important}
+
+/* ---------- LOGIN ---------- */
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(1200px 600px at 20% -10%,#1e293b,transparent),radial-gradient(1000px 600px at 110% 110%,#334155,transparent),var(--navy)}
+.login-card{background:var(--card);border-radius:20px;box-shadow:var(--shadow-l);width:100%;max-width:430px;padding:38px 34px;animation:pop .4s ease}
+@keyframes pop{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.logo{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-d));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:20px;box-shadow:0 6px 16px rgba(245,158,11,.4)}
+.brand h1{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.brand .sub{font-size:12px;color:var(--muted);font-weight:500}
+.login-card p.lead{color:var(--muted);margin:16px 0 20px;font-size:13.5px}
+label.fld{display:block;font-weight:600;font-size:12.5px;color:var(--navy3);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.4px}
+.sel,input.txt,textarea.txt{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;background:#fff;color:var(--ink);transition:.15s}
+.sel:focus,input.txt:focus,textarea.txt:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:10px;font-weight:600;font-size:14px;transition:.15s;white-space:nowrap}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-d));color:#fff;box-shadow:0 4px 12px rgba(245,158,11,.35)}
+.btn-primary:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{filter:brightness(1.07)}
+.btn-ghost{background:#fff;border:1.5px solid var(--border);color:var(--navy3)}.btn-ghost:hover{background:#f8fafc;border-color:#cbd5e1}
+.btn-block{width:100%;margin-top:22px;padding:13px}
+.role-hint{margin-top:16px;font-size:12px;color:var(--muted);text-align:center}
+.role-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;margin-left:6px}
+.badge-admin{background:var(--blue-l);color:var(--blue)}
+.badge-site{background:var(--ok-l);color:var(--ok)}
+
+/* ---------- SHELL ---------- */
+#shell{display:flex;min-height:100vh}
+.sidebar{width:240px;background:var(--navy);color:#cbd5e1;flex-shrink:0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.sb-brand{padding:20px 18px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--navy3)}
+.sb-brand .logo{width:38px;height:38px;font-size:17px;border-radius:10px}
+.sb-brand h1{font-size:16px;color:#fff;font-weight:800;line-height:1.1}
+.sb-brand .sub{font-size:10.5px;color:#94a3b8}
+.sb-nav{padding:14px 10px;flex:1}
+.nav-item{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:9px;color:#cbd5e1;font-weight:500;font-size:14px;width:100%;text-align:left;margin-bottom:3px;transition:.13s}
+.nav-item:hover{background:var(--navy2);color:#fff}
+.nav-item.active{background:linear-gradient(135deg,var(--accent),var(--accent-d));color:#fff;font-weight:600;box-shadow:0 4px 12px rgba(245,158,11,.3)}
+.nav-item .ic{width:18px;text-align:center;font-size:15px}
+.sb-user{padding:14px;border-top:1px solid var(--navy3)}
+.sb-user .who{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.sb-user .nm{font-size:13.5px;color:#fff;font-weight:600;line-height:1.1}
+.sb-user .rl{font-size:11px;color:#94a3b8}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:14px 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.topbar h2{font-size:18px;font-weight:700}
+.topbar .crumb{font-size:12px;color:var(--muted)}
+.sync-pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px}
+.sync-live{background:var(--ok-l);color:var(--ok)}
+.sync-off{background:#fef3c7;color:#b45309}
+.dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+.sync-live .dot{animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.content{padding:24px 26px;flex:1}
+.hamb{display:none;font-size:22px;color:var(--navy);background:none}
+
+/* ---------- CARDS / KPI ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:22px}
+.kpi{background:var(--card);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);border:1px solid var(--border);position:relative;overflow:hidden}
+.kpi .k-ic{position:absolute;right:-6px;top:-6px;font-size:54px;opacity:.06}
+.kpi .k-lbl{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.kpi .k-val{font-size:26px;font-weight:800;margin-top:6px;letter-spacing:-.6px}
+.kpi .k-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.kpi.k-amber{border-top:3px solid var(--accent)}
+.kpi.k-blue{border-top:3px solid var(--blue)}
+.kpi.k-green{border-top:3px solid var(--ok)}
+.kpi.k-slate{border-top:3px solid var(--navy3)}
+
+.card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:20px}
+.card-h{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.card-h h3{font-size:15px;font-weight:700}
+.card-b{padding:20px}
+
+/* ---------- FORM ---------- */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px}
+.fg{display:flex;flex-direction:column}
+.fg label{font-weight:600;font-size:12px;color:var(--navy3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+.fg label .req{color:var(--danger)}
+.fg .ro{background:#f8fafc;color:var(--navy3);font-weight:600}
+.fg .calc{background:#fffbeb;border-color:#fcd34d;font-weight:700;color:var(--accent-d)}
+.fg small{font-size:11px;color:var(--muted);margin-top:4px}
+.form-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.span-wide{grid-column:1/-1}
+.invalid{border-color:var(--danger)!important;box-shadow:0 0 0 3px rgba(220,38,38,.12)!important}
+
+/* ---------- ITEM BLOCK (multi BOQ) ---------- */
+.item-block{border:1.5px solid var(--border);border-radius:14px;padding:16px 16px 6px;margin-bottom:14px;background:#fcfdff;position:relative}
+.item-block .blk-head{display:flex;align-items:flex-end;gap:10px;margin-bottom:14px}
+.blk-tag{position:absolute;top:-10px;left:14px;background:var(--blue);color:#fff;font-size:10.5px;font-weight:700;padding:2px 10px;border-radius:999px;letter-spacing:.3px}
+.ico-plus{width:40px;height:42px;border-radius:10px;background:var(--ok-l);color:var(--ok);border:1.5px solid #6ee7b7;font-size:20px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.ico-plus:hover{background:#bbf7d0}
+.ico-x{width:40px;height:42px;border-radius:10px;background:#fff;color:var(--danger);border:1.5px solid var(--border);font-size:16px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.ico-x:hover{background:var(--danger-l);border-color:#fca5a5}
+.btn-add{background:var(--blue-l);color:var(--blue);border:1.5px dashed #93c5fd;padding:11px 18px;border-radius:10px;font-weight:700;width:100%;margin-bottom:4px}
+.btn-add:hover{background:#c7dbff}
+
+/* ---------- FILTER BAR ---------- */
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end}
+.filters .fg label{font-size:11px}
+.filters .sel,.filters input{padding:9px 11px}
+
+/* ---------- TABLE ---------- */
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table.dt{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}
+table.dt th{background:#f8fafc;color:var(--navy3);font-weight:700;text-align:left;padding:10px 12px;border-bottom:2px solid var(--border);font-size:11.5px;text-transform:uppercase;letter-spacing:.3px;position:sticky;top:0}
+table.dt td{padding:9px 12px;border-bottom:1px solid #f1f5f9}
+table.dt tr:hover td{background:#f8fafc}
+table.dt td.num,table.dt th.num{text-align:right;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;background:#f1f5f9;color:var(--navy3)}
+.pill.site{background:var(--blue-l);color:var(--blue)}
+.ico-btn{width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;border:1px solid var(--border);background:#fff;margin:0 2px}
+.ico-btn:hover{background:#f8fafc}
+.ico-btn.del:hover{background:var(--danger-l);border-color:#fca5a5;color:var(--danger)}
+.ico-btn.edit:hover{background:var(--blue-l);border-color:#93c5fd;color:var(--blue)}
+.empty{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty .big{font-size:44px;opacity:.4;margin-bottom:10px}
+
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;margin-bottom:20px}
+.chart-card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);border:1px solid var(--border);padding:16px 18px}
+.chart-card h4{font-size:13.5px;font-weight:700;margin-bottom:12px;color:var(--navy3)}
+.chart-box{position:relative;height:260px}
+
+.toolbar{display:flex;gap:9px;flex-wrap:wrap}
+.btn-sm{padding:8px 13px;font-size:12.5px;border-radius:8px}
+.btn-csv{background:#ecfdf5;color:var(--ok);border:1px solid #a7f3d0}
+.btn-xls{background:#ecfdf5;color:#047857;border:1px solid #6ee7b7}
+.btn-pdf{background:var(--danger-l);color:var(--danger);border:1px solid #fca5a5}
+.btn-csv:hover,.btn-xls:hover,.btn-pdf:hover{filter:brightness(.97)}
+
+/* ---------- MODAL ---------- */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:flex-start;justify-content:center;padding:28px;z-index:60;overflow-y:auto}
+.modal{background:#fff;border-radius:16px;box-shadow:var(--shadow-l);width:100%;max-width:820px;animation:pop .25s ease;margin:auto}
+.modal-h{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-h h3{font-size:16px;font-weight:700}
+.modal-b{padding:22px}
+.x{font-size:20px;color:var(--muted);width:34px;height:34px;border-radius:8px}
+.x:hover{background:#f1f5f9}
+.confirm{max-width:400px}
+.confirm .modal-b{text-align:center;padding:28px 24px}
+.confirm .c-ic{font-size:40px;margin-bottom:12px}
+
+/* ---------- TOAST ---------- */
+#toasts{position:fixed;bottom:22px;right:22px;z-index:90;display:flex;flex-direction:column;gap:10px}
+.toast{background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;box-shadow:var(--shadow-l);font-size:13.5px;font-weight:500;display:flex;align-items:center;gap:10px;animation:slide .3s ease;max-width:340px}
+@keyframes slide{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
+.toast.ok{background:var(--ok)}.toast.err{background:var(--danger)}.toast.warn{background:var(--accent-d)}
+
+.section-note{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:11px 15px;font-size:12.5px;color:#92400e;margin-bottom:16px;display:flex;gap:9px}
+
+@media(max-width:820px){
+  .sidebar{position:fixed;left:0;top:0;z-index:50;transform:translateX(-100%);transition:.25s;box-shadow:var(--shadow-l)}
+  .sidebar.open{transform:none}
+  .hamb{display:block}
+  .content{padding:18px 15px}
+  .topbar{padding:12px 15px}
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-card">
+    <div class="brand">
+      <div class="logo">PS</div>
+      <div><h1>PragatiSetu</h1><div class="sub">Daily DPR Management System · JCC Infraprojects</div></div>
+    </div>
+    <p class="lead">Select your name to open your DPR workspace. Site engineers see and manage their own entries; admins get the full command centre.</p>
+    <label class="fld" for="loginName">Your Name</label>
+    <select id="loginName" class="sel"><option value="">— Select your name —</option></select>
+    <div id="roleLine" class="role-hint"></div>
+    <button id="loginBtn" class="btn btn-primary btn-block">Enter Workspace →</button>
+    <div class="role-hint">FOB 14-Site Project · BOQ Item-wise Daily Progress</div>
+  </div>
+</div>
+
+<!-- SHELL -->
+<div id="shell" class="hidden">
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="logo">PS</div>
+      <div><h1>PragatiSetu</h1><div class="sub">Daily DPR System</div></div>
+    </div>
+    <nav class="sb-nav" id="navLinks"></nav>
+    <div class="sb-user">
+      <div class="who"><div class="avatar" id="sbAv">?</div>
+        <div><div class="nm" id="sbName">—</div><div class="rl" id="sbRole">—</div></div></div>
+      <button class="nav-item" id="logoutBtn" style="background:var(--navy2)"><span class="ic">⎋</span> Logout</button>
+    </div>
+  </aside>
+  <div class="scrim hidden" id="scrim"></div>
+
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="hamb" id="hamb">☰</button>
+        <div><h2 id="pageTitle">Dashboard</h2><div class="crumb" id="pageCrumb">—</div></div>
+      </div>
+      <div id="syncPill" class="sync-pill sync-off"><span class="dot"></span><span id="syncText">Connecting…</span></div>
+    </div>
+    <div id="offlineBar" style="display:none;background:#fef3c7;color:#92400e;padding:8px 26px;font-size:12.5px;border-bottom:1px solid #fde68a">⚠ Cloud sync is OFF — entries are saving only on this device/browser. To share data across all devices, set the backend URL (see the setup guide shared with this file).</div>
+    <div class="content" id="main"></div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+<div id="modalRoot"></div>
+
+<script>
+/* ============================================================
+   PragatiSetu — Daily DPR Management System
+   JCC Infraprojects · FOB 14-site BOQ item-wise DPR
+   ============================================================ */
+
+const BOQ = [{"item":"13041","desc":"Portable fencing along running track","unit":"M","qty":200.0,"rate":258.222806},{"item":"13051","desc":"3 horizontal bamboo Barricating","unit":"M","qty":3500.0,"rate":151.265574},{"item":"41011","desc":"Plate/Semi Through/Composite Girder","unit":"MT","qty":1810.2,"rate":134838.341656},{"item":"41011(A)","desc":"Girder material receipt stage 40%","unit":"MT","qty":0,"rate":0},{"item":"41011(B)","desc":"Girder fabrication stage 20%","unit":"MT","qty":0,"rate":0},{"item":"41011(C)","desc":"Girder erection/launching stage 20%","unit":"MT","qty":0,"rate":0},{"item":"41011(D)","desc":"Girder completion stage 20%","unit":"MT","qty":0,"rate":0},{"item":"41013","desc":"Extra for E350 steel","unit":"MT","qty":1810.2,"rate":4612.403672},{"item":"41014","desc":"Deduction for Quality BR","unit":"MT","qty":0.0,"rate":-365.853892},{"item":"41020","desc":"HSFG bolts with DTI washers","unit":"KG","qty":52043.0,"rate":176.22747},{"item":"41041","desc":"Metallizing of new girder","unit":"SQM","qty":80804.0,"rate":757.021256},{"item":"41060","desc":"MS angles for stair nosing","unit":"KG","qty":20828.0,"rate":119.369818},{"item":"41300","desc":"Assembling/erecting prefabricated FOB structures","unit":"MT","qty":0.0,"rate":8470.49127},{"item":"41301","desc":"Extra over 41300 under traffic/power block","unit":"MT","qty":0.0,"rate":272.988998},{"item":"41321","desc":"Launching prefabricated steel/PSC girders","unit":"MT","qty":0.0,"rate":1424.917996},{"item":"211201","desc":"JCB Backhoe Loader","unit":"Hr","qty":0.0,"rate":272.988998},{"item":"1.1.11.1","desc":"CARRIAGE OF MATERIALS -1km","unit":"MT","qty":150.0,"rate":125.058633},{"item":"1.1.11.2","desc":"CARRIAGE OF MATERIALS -2km","unit":"MT","qty":50.0,"rate":141.407504},{"item":"2.33.2","desc":"Tree Cutting Beyond 60 cm girth upto and including 120 cm girth","unit":"Each","qty":4.0,"rate":1908.002049},{"item":"2.33.3","desc":"Tree Cutting Beyond 120 cm girth upto and including 240 cm girth","unit":"Each","qty":12.0,"rate":8855.931336},{"item":"2.33.4","desc":"Tree Cutting Above 240 cm girth","unit":"Each","qty":2.0,"rate":17741.694246},{"item":"2.7.1","desc":"Excavation Ordinary rock","unit":"cum","qty":2000.0,"rate":402.58},{"item":"2.25","desc":"Filling available excavated earth (excluding rock) in trenches, plinth, sides of foundations etc","unit":"cum","qty":23000.0,"rate":247.572808},{"item":"2.25A","desc":"Excavating, supplying and filling of local earth (including royalty) by mechanical transport upto a lead of 5km .","unit":"cum","qty":100.0,"rate":359.392461},{"item":"2.26.1","desc":"All kinds of soil","unit":"cum","qty":14877.0,"rate":101.875796},{"item":"2.27","desc":"Supplying and filling in plinth with complete.","unit":"cum","qty":2029.0,"rate":2106.927946},{"item":"2.6.1","desc":"Excavation All kinds of soil","unit":"cum","qty":30951.3,"rate":200.29074},{"item":"4.1.3","desc":"PCC Concrete 1:2:4","unit":"cum","qty":500.0,"rate":7180.196353},{"item":"4.1.5","desc":"PCC Concrete 1:3:6","unit":"cum","qty":1500.0,"rate":6661.799659},{"item":"4.20.1.2","desc":"PCC Concrete of M15 grade cement content of 240 kg /cum","unit":"cum","qty":175.0,"rate":7969.465678},{"item":"4.3.1","desc":"PCC Foundations, footings, bases for columns","unit":"Sqm","qty":1000.0,"rate":300.21676},{"item":"5.1.2","desc":"RCC 1:1.5:3","unit":"cum","qty":30.0,"rate":8154.15821},{"item":"5.11.1","desc":"RCC Suspended floors, roofs, landing, beams and balconies","unit":"Sqm","qty":2000.0,"rate":311.232994},{"item":"5.2.2","desc":"RCC 1:1.5:3","unit":"cum","qty":50.0,"rate":9929.283024},{"item":"5.22.6","desc":"Thermo-Mechanically  upto plinth level Fe-500D or more.","unit":"Kg","qty":945000.0,"rate":87.398709},{"item":"5.22A.6","desc":"Thermo-Mechanically  above plinth level. Fe-500D or more.","unit":"Kg","qty":354351.0,"rate":87.398709},{"item":"5.33.1.1","desc":"Concrete of M25 grade with  minimum cement content of 330 kg /cum","unit":"cum","qty":3800.0,"rate":8465.732414},{"item":"5.33.1.2","desc":"Concrete of M30 grade with  minimum cement  content of 350 kg /cum","unit":"cum","qty":2846.0,"rate":8603.727811},{"item":"5.33.2.1","desc":"Concrete of M25 grade with  minimum cement  content of 330 kg /cum","unit":"cum","qty":140.0,"rate":10047.390706},{"item":"5.33.2.2","desc":"Concrete of M30 grade with  minimum cement  content of 350 kg /cum","unit":"cum","qty":1799.0,"rate":10214.632742},{"item":"5.33.2.3","desc":"Concrete of M35 grade with  minimum cement  content of 370 kg /cum","unit":"cum","qty":1118.0,"rate":10323.430243},{"item":"5.35","desc":"Add for using extra cement in the items of design mix over and above the specified cement content therein.","unit":"Quintal","qty":1200.0,"rate":671.161644},{"item":"5.9.1","desc":"Foundations, footings, bases of columns, etc. for mass concrete","unit":"Sqm","qty":6000.0,"rate":300.21676},{"item":"5.9.2","desc":"Walls (any thickness) including attached pilasters, butteresses, plinth and string courses etc.","unit":"Sqm","qty":600.0,"rate":652.73626},{"item":"5.9.3","desc":"Suspended floors, roofs, landings, balconies and access platform","unit":"Sqm","qty":8820.0,"rate":747.300396},{"item":"5.9.5","desc":"Lintels, beams, plinth beams, girders, bressumers and cantilevers","unit":"Sqm","qty":500.0,"rate":593.073115},{"item":"5.9.6","desc":"Columns, Pillars, Piers, Abutments, Posts and Struts","unit":"Sqm","qty":6800.0,"rate":784.053674},{"item":"5.9.7","desc":"Stairs, (excluding landings) except spiral-staircases","unit":"Sqm","qty":3216.88,"rate":641.232582},{"item":"6.1.2","desc":"Brick Work Cement mortar 1:6 (1 cement : 6 coarse sand)","unit":"cum","qty":150.0,"rate":6491.048026},{"item":"6.4.2","desc":"Brick Work Cement mortar 1:6 (1 cement : 6 coarse sand)","unit":"cum","qty":50.0,"rate":8080.212955},{"item":"7.1.1","desc":"Stone Work Cement mortar 1:6 (1 cement : 6 coarse sand)","unit":"cum","qty":506.0,"rate":6486.368564},{"item":"7.2.1","desc":"Stone WorkCement mortar 1:6 (1 cement : 6 coarse sand)","unit":"cum","qty":150.0,"rate":8067.880622},{"item":"10.1","desc":"Structural steel single sections","unit":"KG","qty":3000.0,"rate":90.713328},{"item":"10.2","desc":"Structural steel built-up sections","unit":"KG","qty":1800000.0,"rate":109.138712},{"item":"10.16.1","desc":"Hot finished welded tubular sections","unit":"KG","qty":650000.0,"rate":151.010151},{"item":"10.19","desc":"Holding-down bolts with nuts/washer plates","unit":"KG","qty":70835.0,"rate":86.277588},{"item":"10.20","desc":"Bolts with nuts and washers","unit":"KG","qty":2000.0,"rate":136.630553},{"item":"11.20.3","desc":"Chequered precast cement concrete tiles 22 mm","unit":"SQM","qty":9529.0,"rate":959.241048},{"item":"11.26.1","desc":"Kota stone flooring 25 mm","unit":"SQM","qty":1663.7439,"rate":1576.0},{"item":"11.55.1","desc":"Providing and fixing flame-finished granite stone slabs (Jet Black/Cherry Red/Elite Brown/Cat Eye or equivalent)","unit":"SQM","qty":3634.0,"rate":2524.862431},{"item":"11.56.1","desc":"Polished Granite stone slab colour of Black, Cherry/Ruby Red or equivalent","unit":"SQM","qty":2207.0,"rate":3810.642214},{"item":"12.41.2","desc":"110 mm diameter","unit":"M","qty":4530.0,"rate":311.720438},{"item":"12.42.5.2","desc":"110 mm bend","unit":"JOB","qty":42.0,"rate":128.685216},{"item":"12.42.6.2","desc":"110 mm Shoe","unit":"JOB","qty":42.0,"rate":113.038264},{"item":"12.43.2","desc":"110 mm","unit":"JOB","qty":200.0,"rate":301.727836},{"item":"12.5","desc":"Providing and fixing 0.50 mm thick precoated GI profile sheets with 120 GSM zinc coating","unit":"SQM","qty":16003.0,"rate":654.686036},{"item":"12.51.1","desc":"Ridges plain (500 - 600mm)","unit":"M","qty":2321.0,"rate":439.284533},{"item":"12.51.6","desc":"Gutter (600 mm over all girth)","unit":"M","qty":300.0,"rate":1082.710613},{"item":"13.2.2","desc":"1:6 (1 cement: 6 fine sand)","unit":"SQM","qty":600.0,"rate":316.156178},{"item":"13.3.2","desc":"1:6 (1 cement: 6 fine sand)","unit":"SQM","qty":2021.0,"rate":372.504705},{"item":"13.61.1","desc":"Two or more coats on new work","unit":"SQM","qty":2500.0,"rate":128.149028},{"item":"13.63.1","desc":"Two or more coats on new work","unit":"SQM","qty":15000.0,"rate":118.400148},{"item":"15.18","desc":"Demolishing   brick   work Dismantling steel work in built up sections in .","unit":"Kg","qty":200000.0,"rate":4.533229},{"item":"15.2.1","desc":"Nominal concrete 1:3:6","unit":"cum","qty":1840.0,"rate":1956.697705},{"item":"15.2.2","desc":"Nominal concrete 1:4:8","unit":"cum","qty":0.0,"rate":1208.471165},{"item":"15.2","desc":"Extra for dismantling trusses, rafters, purlins etc","unit":"kg/M","qty":90538.0,"rate":0.682422},{"item":"15.23.1","desc":"Dismantling tile work in floors For thickness of tiles 10 mm to 25 mm","unit":"Sqm","qty":6000.0,"rate":58.980724},{"item":"15.25","desc":"Dismantling roofing Dismantling stone slab flooring laid in cement mortar.","unit":"Sqm","qty":3819.0,"rate":214.231638},{"item":"15.28.1","desc":"G.S. Sheet","unit":"Sqm","qty":1000.0,"rate":132.584768},{"item":"15.28.2","desc":"Asbestos Cement sheet","unit":"Sqm","qty":400.0,"rate":62.14911},{"item":"15.3","desc":"Demolishing R.C.C. work manually/ by mechanical.","unit":"cum","qty":961.2,"rate":2854.569553},{"item":"15.43.2","desc":"bituminous road","unit":"Sqm","qty":1400.0,"rate":344.769141},{"item":"15.6","desc":"Disposal of building rubbish / malba / similar unserviceable","unit":"cum","qty":3871.0,"rate":213.841683},{"item":"15.7.4","desc":"Demolishing   brick   work In cement mortar","unit":"cum","qty":451.6,"rate":1655.798524},{"item":"15.10.2","desc":"Demolishing   brick   work  In cement mortar","unit":"cum","qty":200.0,"rate":2312.726802},{"item":"15.13.1","desc":"Demolishing   brick   work  Of area 3 sq. metres and below","unit":"Each","qty":16.0,"rate":115.32925},{"item":"15.13.2","desc":"Demolishing   brick   work  Of area beyond 3 sq. metres","unit":"Each","qty":15.0,"rate":151.838806},{"item":"15.40.2","desc":"Thickness above 40 mm up to 75 mm","unit":"Sqm","qty":10.0,"rate":348.619949},{"item":"15.52","desc":"Dismantling of flushing cistern of all types (C.I./PVC/Vitrious China) including stacking of useful materials near the site and disposal of unserviceable materials within 50 metres lead.","unit":"Each","qty":2.0,"rate":725.901605},{"item":"15.57","desc":"Dismantling aluminium/ Gypsum partitions, doors, windows, fixed glazing and false ceiling including disposal of unserviceable material and stacking of serviceable material with in 50 meters lead as directed by Engineer-in-charge.","unit":"Sqm","qty":5.0,"rate":45.332292},{"item":"15.9.2","desc":"Demolishing   brick   work  In cement mortar","unit":"cum","qty":400.0,"rate":1976.195465},{"item":"16.78.3","desc":"ROAD WORK With material conforming to Grade-III","unit":"cum","qty":500.0,"rate":2547.3336},{"item":"16.81","desc":"Providing and erecting 2.00 m high temporary MS barricading with MS angle/tube frame, 1.63 mm MS sheet, 30 × 5 mm flat and ISLC 75 supports, including fixing, welding/riveting, complete.","unit":"M","qty":500.0,"rate":2756.398331},{"item":"26.65","desc":"Galvanized steel deck sheet permanent shuttering","unit":"SQM","qty":6300.0,"rate":1589.457395},{"item":"NS-1","desc":"Protective Screen on FOB/ROB complete With All respect.","unit":"KG","qty":133119.0,"rate":129.51062},{"item":"NS-2","desc":"Schedule C decking system / roof ceiling","unit":"SQM","qty":6594.0,"rate":1598.982},{"item":"NS-3","desc":"Extra launching under traffic/power block","unit":"MT","qty":386.9813,"rate":1718.0},{"item":"NS-4","desc":"Deduction for E350 Quality A in lieu of Quality B0 as per IS:2062.","unit":"MT","qty":-1624.0673,"rate":0.0},{"item":"NS-5","desc":"Design of FOB . approved agency as per Railway requirements.","unit":"JOB","qty":220420.6516,"rate":0.0},{"item":"NS-NEW-1","desc":"Third-party girder fabrication inspection","unit":"MT","qty":0.0,"rate":1808.36},{"item":"NS-NEW-2","desc":"Delaunching/launching by 140/160 MT crane","unit":"MT","qty":0.0,"rate":23315.79},{"item":"NS-NEW-3","desc":"Extra over 10.2 for tubular box section","unit":"KG","qty":0.0,"rate":26.2},{"item":"NS-NEW-4","desc":"GAD/TAD preparation","unit":"JOB","qty":0.0,"rate":20000.0},{"item":"NS-NEW-5","desc":"Precast RCC work up to 15 m","unit":"CUM","qty":0.0,"rate":8186.82},{"item":"NS-NEW-6","desc":"FOSROC Conbextra GP2 grout","unit":"CUM","qty":0.0,"rate":53100.0}];
+
+const SITES = ["Beawar","Sojat","Marwar","Falna","Jawai Bandh","Pindwara","Bijaynagar","Bhilwara","Kapasan","Mavli","Fatehnagar","Dungarpur","Someshwar","Ranapratap"];
+const ADMINS = ["Vimlesh Tailor","Akshita Bansal"];
+const USERS  = ["Abid","Vikas Saini","Vikas Kumar","Chandrakant","Hardev","Sujan","Sheshnath","Umesh","M.K. Meena","Rajesh Jatav","Tikkam Chand","Biram Gurjar"];
+
+/* ===========================================================
+   BACKEND CONFIG  —  PASTE YOUR GOOGLE APPS SCRIPT URL BELOW
+   (Deploy Code.gs as a Web App → copy the /exec URL → paste here)
+   Leave it "" to run in local-only mode (data stays on this device).
+   =========================================================== */
+const API_URL = "https://script.google.com/macros/s/AKfycbxgN9MdmTgI4aMXoOaveuRBBEHSivmt5cUfd1dsoUFmTWq7pC4NRS0dV3ZQiqIZUIMFAw/exec";
+const POLL_MS = 15000;   // auto-refresh interval when online
+
+const LS_SESSION='pragatisetu_session', LS_ENTRIES='pragatisetu_entries';
+
+let online=false, pollTimer=null, syncMode='off';
+let entries=[];          // all entries (cache)
+let session=null;        // {name, role}
+let activeTab='';
+let charts={};
+
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=(v,d=0)=>{const n=parseFloat(v);return isNaN(n)?d:n;};
+const genId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const fmtMoney=n=>'₹'+ (Number(n)||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+const fmtNum=(n,d=3)=>(Number(n)||0).toLocaleString('en-IN',{maximumFractionDigits:d});
+const todayISO=()=>new Date().toLocaleDateString('en-CA');
+const initials=n=>n.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+// particular (auto BOQ desc) / description (manual) with back-compat for old rows
+const partOf=e=>e.particular||e.description||'';
+const descOf=e=>e.particular?(e.description||''):'';
+function toast(msg,type=''){const t=document.createElement('div');t.className='toast '+type;t.innerHTML=(type==='ok'?'✓ ':type==='err'?'✕ ':type==='warn'?'⚠ ':'')+esc(msg);$('#toasts').appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(30px)';t.style.transition='.3s';setTimeout(()=>t.remove(),300);},3200);}
+
+/* ============================================================
+   STORE — central backend via Google Apps Script, else local
+   ============================================================ */
+function setSync(mode){
+  syncMode=mode;const p=$('#syncPill'),t=$('#syncText'),bar=$('#offlineBar');
+  if(p){
+    if(mode==='live'){p.className='sync-pill sync-live';t.textContent='Live · cloud synced';}
+    else if(mode==='err'){p.className='sync-pill sync-off';t.textContent='Offline · using local copy';}
+    else{p.className='sync-pill sync-off';t.textContent='Local only · not synced';}
+  }
+  if(bar)bar.style.display=(mode==='live')?'none':'block';
+}
+function sortEntries(){entries.sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.createdAt||0)-(a.createdAt||0));}
+function cacheSave(){try{localStorage.setItem(LS_ENTRIES,JSON.stringify(entries));}catch(e){}}
+function cacheLoad(){try{entries=JSON.parse(localStorage.getItem(LS_ENTRIES)||'[]');}catch(e){entries=[];}sortEntries();}
+function num_(v){const f=parseFloat(v);return isNaN(f)?0:f;}
+function normalize(e){
+  const keepN=k=>(e[k]===''||e[k]==null)?null:num_(e[k]);
+  return Object.assign({},e,{
+    srNo:(e.srNo===''||e.srNo==null)?null:e.srNo,
+    boqQty:num_(e.boqQty),rate:num_(e.rate),
+    n1:keepN('n1'),n2:keepN('n2'),n3:keepN('n3'),
+    coeff:num_(e.coeff),length:num_(e.length),width:num_(e.width),height:num_(e.height),
+    qty:num_(e.qty),amount:num_(e.amount),createdAt:num_(e.createdAt),
+    date:String(e.date||'').slice(0,10),itemNo:String(e.itemNo==null?'':e.itemNo),
+    particular:e.particular==null?'':String(e.particular),description:e.description==null?'':String(e.description)
+  });
+}
+async function apiGetList(){
+  const r=await fetch(API_URL+'?action=list&t='+Date.now(),{method:'GET'});
+  const j=await r.json();
+  return (j.entries||[]).map(normalize);
+}
+async function apiPost(action,payload){
+  const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify(Object.assign({action},payload))});
+  const j=await r.json(); if(j&&j.ok===false)throw new Error(j.error||'write failed'); return j;
+}
+function refreshViews(){
+  if(!session)return;const m=$('#main');
+  if(activeTab==='dash')renderDash(m);
+  else if(activeTab==='all')renderAll(m);
+  else if(activeTab==='mine')renderMine(m);
+  else if(activeTab==='reports'){ if($('#rTbl'))applyFilters(); else renderReports(m); }
+  // entry/add forms are left untouched so the user's typing is never wiped
+}
+async function refresh(silent){
+  if(!online){cacheLoad();setSync('off');if(session&&!silent)renderTab();return;}
+  try{
+    entries=await apiGetList();sortEntries();cacheSave();setSync('live');
+    if(session){ if(silent)refreshViews(); else renderTab(); }
+  }catch(e){
+    console.warn('refresh failed',e);setSync('err');
+    if(!entries.length)cacheLoad();
+    if(session&&!silent)renderTab();
+  }
+}
+async function initBackend(){
+  online = !!API_URL && /^https?:\/\//.test(API_URL);
+  if(online){ await refresh(false); if(pollTimer)clearInterval(pollTimer); pollTimer=setInterval(()=>refresh(true),POLL_MS); }
+  else { cacheLoad(); setSync('off'); if(session)renderTab(); }
+}
+async function addEntry(obj){
+  obj.id=genId();obj.createdAt=Date.now();
+  if(online){ try{ await apiPost('add',{entry:obj}); }
+    catch(e){ toast('Save failed — check internet / backend URL','err'); return false; } }
+  entries.unshift(normalize(obj));sortEntries();cacheSave();return true;
+}
+async function addEntries(list){ let n=0; for(const o of list){ const ok=await addEntry(o); if(ok)n++; else break; } return n; }
+async function updateEntry(id,obj){
+  obj.id=id;
+  if(online){ try{ await apiPost('update',{id,entry:obj}); }
+    catch(e){ toast('Update failed — check internet / backend','err'); return false; } }
+  const i=entries.findIndex(e=>e.id===id);
+  if(i>=0)entries[i]=normalize(Object.assign({},entries[i],obj,{id}));
+  sortEntries();cacheSave();refreshViews();return true;
+}
+async function removeEntry(id){
+  if(online){ try{ await apiPost('delete',{id}); }
+    catch(e){ toast('Delete failed — check internet / backend','err'); return false; } }
+  entries=entries.filter(e=>e.id!==id);cacheSave();refreshViews();return true;
+}
+function visibleEntries(){
+  if(!session)return[];
+  return session.role==='admin'?entries:entries.filter(e=>e.user===session.name);
+}
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+function buildLogin(){
+  const sel=$('#loginName');
+  sel.insertAdjacentHTML('beforeend',
+    '<optgroup label="Administrators">'+ADMINS.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')+'</optgroup>'+
+    '<optgroup label="Site Engineers">'+USERS.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')+'</optgroup>');
+  sel.addEventListener('change',()=>{
+    const n=sel.value,line=$('#roleLine');
+    if(!n){line.innerHTML='';return;}
+    const role=ADMINS.includes(n)?'admin':'site';
+    line.innerHTML= role==='admin'
+      ? `Signing in as <b>${esc(n)}</b> <span class="role-badge badge-admin">ADMIN · full access</span>`
+      : `Signing in as <b>${esc(n)}</b> <span class="role-badge badge-site">SITE · your entries</span>`;
+  });
+  $('#loginBtn').addEventListener('click',()=>{
+    const n=$('#loginName').value;
+    if(!n){toast('Please select your name','warn');return;}
+    doLogin(n);
+  });
+}
+function doLogin(name){
+  session={name,role:ADMINS.includes(name)?'admin':'site'};
+  try{ localStorage.setItem(LS_SESSION,JSON.stringify(session)); }catch(e){}
+  openShell();
+}
+function logout(){
+  session=null;try{ localStorage.removeItem(LS_SESSION); }catch(e){}
+  $('#shell').classList.add('hidden');$('#login').classList.remove('hidden');
+  $('#loginName').value='';$('#roleLine').innerHTML='';
+}
+
+/* ============================================================
+   SHELL + NAV
+   ============================================================ */
+const SITE_NAV=[{k:'entry',ic:'✎',t:'New DPR Entry'},{k:'mine',ic:'▦',t:'My Entries'}];
+const ADMIN_NAV=[{k:'dash',ic:'◈',t:'Dashboard'},{k:'all',ic:'▦',t:'All Entries'},{k:'add',ic:'✎',t:'Add Entry'},{k:'reports',ic:'⇩',t:'Reports & Export'}];
+
+function openShell(){
+  $('#login').classList.add('hidden');$('#shell').classList.remove('hidden');
+  $('#sbAv').textContent=initials(session.name);
+  $('#sbName').textContent=session.name;
+  $('#sbRole').textContent=session.role==='admin'?'Administrator':'Site Engineer';
+  const nav=session.role==='admin'?ADMIN_NAV:SITE_NAV;
+  $('#navLinks').innerHTML=nav.map(n=>`<button class="nav-item" data-tab="${n.k}"><span class="ic">${n.ic}</span> ${n.t}</button>`).join('');
+  $$('#navLinks .nav-item').forEach(b=>b.addEventListener('click',()=>{go(b.dataset.tab);closeSide();}));
+  go(nav[0].k);
+  setSync(syncMode);
+}
+function go(tab){
+  activeTab=tab;
+  $$('#navLinks .nav-item').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  renderTab();
+}
+function renderTab(){
+  if(!session)return;
+  const titles={entry:['New DPR Entry','Log today\'s item-wise progress'],mine:['My Entries','Your submitted DPR records'],
+    dash:['Dashboard','Up-to-date progress across all 14 sites'],all:['All Entries','Every DPR record from all site engineers'],
+    add:['Add Entry','Create a DPR record'],reports:['Reports & Export','Filter, analyse and download']};
+  const t=titles[activeTab]||['',''];
+  $('#pageTitle').textContent=t[0];$('#pageCrumb').textContent=t[1];
+  const m=$('#main');
+  if(activeTab==='entry')renderMultiEntry(m,false);
+  else if(activeTab==='mine')renderMine(m);
+  else if(activeTab==='dash')renderDash(m);
+  else if(activeTab==='all')renderAll(m);
+  else if(activeTab==='add')renderMultiEntry(m,true);
+  else if(activeTab==='reports')renderReports(m);
+}
+function closeSide(){$('#sidebar').classList.remove('open');$('#scrim').classList.add('hidden');}
+
+/* ============================================================
+   ENTRY FORM (header + repeatable BOQ item blocks)
+   ============================================================ */
+function boqOptions(sel){
+  return '<option value="">— Select BOQ Item —</option>'+BOQ.map(b=>
+    `<option value="${esc(b.item)}" ${sel===b.item?'selected':''}>${esc(b.item)} — ${esc(b.desc.slice(0,48))}</option>`).join('');
+}
+function siteOptions(sel){return '<option value="">— Select Site —</option>'+SITES.map(s=>`<option ${sel===s?'selected':''}>${esc(s)}</option>`).join('');}
+
+function headerMarkup(d){
+  d=d||{};
+  return `<div class="form-grid">
+    <div class="fg"><label>Date <span class="req">*</span></label>
+      <input type="date" class="txt" id="f_date" value="${esc(d.date||todayISO())}"></div>
+    <div class="fg"><label>Sr. No.</label>
+      <input type="number" class="txt" id="f_sr" value="${d.srNo!=null?esc(d.srNo):''}" placeholder="auto"></div>
+    <div class="fg"><label>Site <span class="req">*</span></label>
+      <select class="sel" id="f_site">${siteOptions(d.site)}</select></div>
+  </div>`;
+}
+
+// one BOQ line-item block. single=true hides +/× (used in edit modal)
+function itemBlockMarkup(d, single){
+  d=d||{};
+  return `<div class="item-block">
+    <span class="blk-tag">BOQ ITEM</span>
+    <div class="blk-head">
+      <div class="fg" style="flex:1;min-width:200px"><label>BOQ Item No. <span class="req">*</span></label>
+        <select class="sel bi-item">${boqOptions(d.itemNo)}</select></div>
+      ${single?'':'<button type="button" class="ico-plus add-here" title="Add another BOQ item">＋</button><button type="button" class="ico-x rm-item" title="Remove this item">✕</button>'}
+    </div>
+    <div class="form-grid">
+      <div class="fg span-wide"><label>Particular</label>
+        <input type="text" class="txt ro bi-particular" value="${esc(d.particular||d.description||'')}" readonly placeholder="auto-filled from BOQ item"></div>
+      <div class="fg span-wide"><label>BOQ Description</label>
+        <input type="text" class="txt bi-desc" value="${esc(d.particular?(d.description||''):'')}" placeholder="Describe the work done (location / stage / detail)"></div>
+      <div class="fg"><label>Unit</label><input type="text" class="txt ro bi-unit" value="${esc(d.unit||'')}" readonly></div>
+      <div class="fg"><label>BOQ Qty</label><input type="text" class="txt ro bi-bqty" value="${d.boqQty!=null?esc(fmtNum(d.boqQty,3)):''}" readonly></div>
+      <div class="fg"><label>BOQ Rate (₹)</label><input type="text" class="txt ro bi-rate" value="${d.rate!=null?esc(d.rate):''}" readonly></div>
+      <div class="fg"><label>N1</label><input type="number" step="any" class="txt bi-n1" value="${d.n1!=null?esc(d.n1):''}" placeholder="1"></div>
+      <div class="fg"><label>N2</label><input type="number" step="any" class="txt bi-n2" value="${d.n2!=null?esc(d.n2):''}" placeholder="1"></div>
+      <div class="fg"><label>N3</label><input type="number" step="any" class="txt bi-n3" value="${d.n3!=null?esc(d.n3):''}" placeholder="1"></div>
+      <div class="fg"><label>Coefficient</label><input type="number" step="any" class="txt bi-coeff" value="${d.coeff!=null?esc(d.coeff):''}" placeholder="1"></div>
+      <div class="fg"><label>Length</label><input type="number" step="any" class="txt bi-len" value="${d.length!=null?esc(d.length):''}" placeholder="1"></div>
+      <div class="fg"><label>Width</label><input type="number" step="any" class="txt bi-wid" value="${d.width!=null?esc(d.width):''}" placeholder="1"></div>
+      <div class="fg"><label>Height</label><input type="number" step="any" class="txt bi-hgt" value="${d.height!=null?esc(d.height):''}" placeholder="1"></div>
+      <div class="fg"><label>Qty (auto)</label><input type="text" class="txt calc bi-qty" value="${esc(d.qty!=null?fmtNum(d.qty,3):'0')}" readonly></div>
+      <div class="fg"><label>Amount ₹ (auto)</label><input type="text" class="txt calc bi-amt" value="${esc(d.amount!=null?fmtNum(d.amount,2):'0')}" readonly></div>
+      <div class="fg span-wide"><label>Remark (if any)</label>
+        <input type="text" class="txt bi-rem" value="${esc(d.remark||'')}" placeholder="optional note"></div>
+    </div>
+  </div>`;
+}
+
+function wireItemBlock(blk){
+  const q=s=>blk.querySelector(s);
+  const item=q('.bi-item');
+  function fill(){
+    const b=BOQ.find(x=>x.item===item.value);
+    q('.bi-particular').value=b?b.desc:'';
+    q('.bi-unit').value=b?b.unit:'';
+    q('.bi-bqty').value=b?fmtNum(b.qty,3):'';
+    q('.bi-rate').value=b?b.rate:'';
+    calc();
+  }
+  function calc(){
+    const n1=num(q('.bi-n1').value,1),n2=num(q('.bi-n2').value,1),n3=num(q('.bi-n3').value,1);
+    const c=num(q('.bi-coeff').value,1),L=num(q('.bi-len').value,1),W=num(q('.bi-wid').value,1),H=num(q('.bi-hgt').value,1);
+    const b=BOQ.find(x=>x.item===item.value);const rate=b?b.rate:0;
+    const qty=n1*n2*n3*c*L*W*H;const amt=qty*rate;
+    q('.bi-qty').value=fmtNum(qty,3);q('.bi-amt').value=fmtNum(amt,2);
+  }
+  item.addEventListener('change',fill);
+  blk.querySelectorAll('.bi-n1,.bi-n2,.bi-n3,.bi-coeff,.bi-len,.bi-wid,.bi-hgt').forEach(el=>el.addEventListener('input',calc));
+  const add=q('.add-here'); if(add) add.addEventListener('click',()=>addItemBlock());
+  const rm=q('.rm-item'); if(rm) rm.addEventListener('click',()=>{
+    const wrap=$('#itemsWrap');
+    if($$('.item-block',wrap).length>1){ blk.remove(); }
+    else toast('At least one BOQ item is required','warn');
+  });
+  calc();
+}
+function addItemBlock(d){
+  const wrap=$('#itemsWrap'); if(!wrap)return;
+  const tmp=document.createElement('div'); tmp.innerHTML=itemBlockMarkup(d||{},false);
+  const blk=tmp.firstElementChild; wrap.appendChild(blk); wireItemBlock(blk);
+  blk.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+// build one entry object from a block + shared header; null if no item chosen
+function buildItemObj(blk, shared){
+  const q=s=>blk.querySelector(s);
+  const b=BOQ.find(x=>x.item===q('.bi-item').value);
+  if(!b) return null;
+  const n1=num(q('.bi-n1').value,1),n2=num(q('.bi-n2').value,1),n3=num(q('.bi-n3').value,1);
+  const c=num(q('.bi-coeff').value,1),L=num(q('.bi-len').value,1),W=num(q('.bi-wid').value,1),H=num(q('.bi-hgt').value,1);
+  const qty=n1*n2*n3*c*L*W*H, amt=qty*(b.rate||0);
+  return {date:shared.date, srNo:shared.srNo, site:shared.site, groupId:shared.groupId,
+    itemNo:b.item, particular:b.desc, description:q('.bi-desc').value.trim(),
+    unit:b.unit, boqQty:b.qty, rate:b.rate,
+    n1,n2,n3, coeff:c, length:L, width:W, height:H, qty, amount:amt,
+    remark:q('.bi-rem').value.trim(), user:session.name, role:session.role};
+}
+function collectEntries(){
+  const dateEl=$('#f_date'),siteEl=$('#f_site');let ok=true;
+  [dateEl,siteEl].forEach(el=>{if(!el.value){el.classList.add('invalid');ok=false;}else el.classList.remove('invalid');});
+  if(!ok){toast('Fill Date and Site','warn');return null;}
+  const shared={date:dateEl.value, srNo:$('#f_sr').value?num($('#f_sr').value):null, site:siteEl.value, groupId:genId()};
+  const blocks=$$('.item-block',$('#itemsWrap'));
+  const out=[]; let emptyMarked=false;
+  blocks.forEach(blk=>{
+    const sel=blk.querySelector('.bi-item');
+    const o=buildItemObj(blk,shared);
+    if(o)out.push(o);
+    else if(blocks.length===1||sel.value===''){ /* skip empties silently unless none */ }
+  });
+  if(!out.length){ blocks[0].querySelector('.bi-item').classList.add('invalid'); toast('Select at least one BOQ item','warn'); return null; }
+  return out;
+}
+
+function renderMultiEntry(m, isAdmin){
+  const nextSr=(isAdmin?entries.length:visibleEntries().length)+1;
+  m.innerHTML=`
+  <div class="section-note">💡 Set <b>Date</b> &amp; <b>Site</b> once, then add one or more BOQ items with the <b>＋</b> button. Select a BOQ Item No. → Particular, Unit, BOQ Qty &amp; Rate auto-fill. <b>Qty = N1 × N2 × N3 × Coefficient × Length × Width × Height</b> · Amount = Qty × Rate.</div>
+  <div class="card"><div class="card-h"><h3>${isAdmin?'Add DPR Entry':'New DPR Entry · '+esc(session.name)}</h3></div>
+    <div class="card-b">
+      ${headerMarkup({srNo:nextSr})}
+      <div style="height:16px"></div>
+      <div id="itemsWrap"></div>
+      <button class="btn-add" id="addItemBtn">＋ Add another BOQ item</button>
+      <div class="form-actions">
+        <button class="btn btn-primary" id="saveBtn">✓ Save DPR Entry</button>
+        <button class="btn btn-ghost" id="resetBtn">Clear</button>
+      </div>
+    </div></div>`;
+  $('#itemsWrap').innerHTML=itemBlockMarkup({},false);
+  wireItemBlock($('#itemsWrap').firstElementChild);
+  $('#addItemBtn').addEventListener('click',()=>addItemBlock());
+  $('#saveBtn').addEventListener('click',async()=>{
+    const list=collectEntries();if(!list)return;
+    $('#saveBtn').disabled=true;
+    const n=await addEntries(list);
+    $('#saveBtn').disabled=false;
+    if(n){toast(n>1?`${n} BOQ items saved`:'DPR entry saved','ok');renderMultiEntry(m,isAdmin);}
+  });
+  $('#resetBtn').addEventListener('click',()=>renderMultiEntry(m,isAdmin));
+}
+
+/* ---------- EDIT MODAL (single line item) ---------- */
+function openEdit(id){
+  const e=entries.find(x=>x.id===id);if(!e)return;
+  const root=$('#modalRoot');
+  root.innerHTML=`<div class="overlay"><div class="modal"><div class="modal-h"><h3>Edit DPR Entry</h3><button class="x" id="mX">✕</button></div>
+    <div class="modal-b">
+      ${headerMarkup(e)}
+      <div style="height:14px"></div>
+      <div id="itemsWrap">${itemBlockMarkup(e,true)}</div>
+      <div class="form-actions">
+        <button class="btn btn-primary" id="mSave">✓ Update</button>
+        <button class="btn btn-ghost" id="mCancel">Cancel</button></div>
+    </div></div></div>`;
+  wireItemBlock($('#itemsWrap').firstElementChild);
+  const close=()=>root.innerHTML='';
+  $('#mX').onclick=close;$('#mCancel').onclick=close;
+  $('#mSave').onclick=async()=>{
+    const dateEl=$('#f_date'),siteEl=$('#f_site');let ok=true;
+    [dateEl,siteEl].forEach(el=>{if(!el.value){el.classList.add('invalid');ok=false;}else el.classList.remove('invalid');});
+    if(!ok){toast('Fill Date and Site','warn');return;}
+    const shared={date:dateEl.value,srNo:$('#f_sr').value?num($('#f_sr').value):null,site:siteEl.value,groupId:e.groupId};
+    const o=buildItemObj($('#itemsWrap .item-block'),shared);
+    if(!o){toast('Select a BOQ item','warn');return;}
+    o.user=e.user;o.role=e.role;o.createdAt=e.createdAt;
+    const done=await updateEntry(id,o);if(done){toast('Entry updated','ok');close();}
+  };
+}
+function confirmDel(id){
+  const e=entries.find(x=>x.id===id);if(!e)return;
+  const root=$('#modalRoot');
+  root.innerHTML=`<div class="overlay"><div class="modal confirm"><div class="modal-b">
+    <div class="c-ic">🗑️</div><h3>Delete this entry?</h3>
+    <p style="color:var(--muted);margin:10px 0 22px">${esc(e.site)} · ${esc(e.itemNo)} · ${fmtMoney(e.amount)} — this cannot be undone.</p>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="btn btn-ghost" id="cNo">Cancel</button>
+      <button class="btn" id="cYes" style="background:var(--danger);color:#fff">Delete</button></div></div></div></div>`;
+  const close=()=>root.innerHTML='';
+  $('#cNo').onclick=close;
+  $('#cYes').onclick=async()=>{const ok=await removeEntry(id);if(ok)toast('Entry deleted','ok');close();};
+}
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+function rowsHTML(list,showUser){
+  if(!list.length)return `<div class="empty"><div class="big">▦</div>No DPR entries yet.</div>`;
+  return `<div class="tbl-wrap"><table class="dt"><thead><tr>
+    <th>Date</th><th>Site</th>${showUser?'<th>By</th>':''}<th>Item</th><th>Particular</th><th>Description</th><th>Unit</th>
+    <th class="num">N1</th><th class="num">N2</th><th class="num">N3</th><th class="num">Coeff</th><th class="num">L</th><th class="num">W</th><th class="num">H</th>
+    <th class="num">Qty</th><th class="num">Rate</th><th class="num">Amount</th><th>Remark</th><th></th></tr></thead><tbody>${
+    list.map(e=>`<tr>
+      <td>${esc(e.date)}</td><td><span class="pill site">${esc(e.site)}</span></td>
+      ${showUser?`<td>${esc(e.user||'')}</td>`:''}
+      <td><b>${esc(e.itemNo)}</b></td>
+      <td title="${esc(partOf(e))}">${esc(partOf(e).slice(0,30))}${partOf(e).length>30?'…':''}</td>
+      <td title="${esc(descOf(e))}">${esc(descOf(e).slice(0,24))}${descOf(e).length>24?'…':''}</td>
+      <td>${esc(e.unit)}</td>
+      <td class="num">${e.n1!=null?fmtNum(e.n1,2):esc(e.nos||'')}</td><td class="num">${e.n2!=null?fmtNum(e.n2,2):''}</td><td class="num">${e.n3!=null?fmtNum(e.n3,2):''}</td>
+      <td class="num">${fmtNum(e.coeff,2)}</td>
+      <td class="num">${fmtNum(e.length,2)}</td><td class="num">${fmtNum(e.width,2)}</td><td class="num">${fmtNum(e.height,2)}</td>
+      <td class="num">${fmtNum(e.qty,3)}</td><td class="num">${fmtNum(e.rate,2)}</td><td class="num"><b>${fmtNum(e.amount,2)}</b></td>
+      <td title="${esc(e.remark)}">${esc((e.remark||'').slice(0,22))}</td>
+      <td style="white-space:nowrap"><button class="ico-btn edit" data-edit="${e.id}">✎</button><button class="ico-btn del" data-del="${e.id}">🗑</button></td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+function wireRowActions(root){
+  $$('[data-edit]',root).forEach(b=>b.onclick=()=>openEdit(b.dataset.edit));
+  $$('[data-del]',root).forEach(b=>b.onclick=()=>confirmDel(b.dataset.del));
+}
+
+function renderMine(m){
+  const list=visibleEntries();
+  const tot=list.reduce((s,e)=>s+(+e.amount||0),0);
+  const sites=new Set(list.map(e=>e.site)).size;
+  m.innerHTML=`
+  <div class="kpis">
+    <div class="kpi k-amber"><div class="k-ic">▦</div><div class="k-lbl">My Entries</div><div class="k-val">${list.length}</div></div>
+    <div class="kpi k-green"><div class="k-ic">₹</div><div class="k-lbl">My Work Done</div><div class="k-val">${fmtMoney(tot)}</div></div>
+    <div class="kpi k-blue"><div class="k-ic">◉</div><div class="k-lbl">Sites Worked</div><div class="k-val">${sites}</div></div>
+    <div class="kpi k-slate"><div class="k-ic">◷</div><div class="k-lbl">Last Entry</div><div class="k-val" style="font-size:18px">${esc(list[0]?.date||'—')}</div></div>
+  </div>
+  <div class="card"><div class="card-h"><h3>My DPR Records</h3>
+    <div class="toolbar">
+      <button class="btn btn-sm btn-csv" id="eCsv">⬇ CSV</button>
+      <button class="btn btn-sm btn-xls" id="eXls">⬇ Excel</button>
+      <button class="btn btn-sm btn-pdf" id="ePdf">⬇ PDF</button></div></div>
+    <div class="card-b" id="mineTbl">${rowsHTML(list,false)}</div></div>`;
+  wireRowActions($('#mineTbl'));
+  $('#eCsv').onclick=()=>exportCSV(list,'My_DPR');
+  $('#eXls').onclick=()=>exportXLSX(list,'My_DPR');
+  $('#ePdf').onclick=()=>exportPDF(list,'My DPR Report — '+session.name);
+}
+function renderAll(m){
+  const list=entries;
+  m.innerHTML=`
+  <div class="card"><div class="card-h"><h3>All DPR Entries · ${list.length} records</h3>
+    <div class="toolbar">
+      <button class="btn btn-sm btn-csv" id="eCsv">⬇ CSV</button>
+      <button class="btn btn-sm btn-xls" id="eXls">⬇ Excel</button>
+      <button class="btn btn-sm btn-pdf" id="ePdf">⬇ PDF</button></div></div>
+    <div class="card-b" id="allTbl">${rowsHTML(list,true)}</div></div>`;
+  wireRowActions($('#allTbl'));
+  $('#eCsv').onclick=()=>exportCSV(list,'All_DPR');
+  $('#eXls').onclick=()=>exportXLSX(list,'All_DPR');
+  $('#ePdf').onclick=()=>exportPDF(list,'All DPR Entries');
+}
+
+/* ============================================================
+   ADMIN DASHBOARD
+   ============================================================ */
+function renderDash(m){
+  const tot=entries.reduce((s,e)=>s+(+e.amount||0),0);
+  const sites=new Set(entries.map(e=>e.site)).size;
+  const last=entries[0]?.date||'—';
+  const totalBOQ=BOQ.reduce((s,b)=>s+(b.qty*b.rate||0),0);
+  const prog=totalBOQ?(tot/totalBOQ*100):0;
+  m.innerHTML=`
+  <div class="kpis">
+    <div class="kpi k-amber"><div class="k-ic">₹</div><div class="k-lbl">Work Done (up to date)</div><div class="k-val">${fmtMoney(tot)}</div><div class="k-sub">${prog.toFixed(2)}% of BOQ value</div></div>
+    <div class="kpi k-blue"><div class="k-ic">▦</div><div class="k-lbl">DPR Entries</div><div class="k-val">${entries.length}</div></div>
+    <div class="kpi k-green"><div class="k-ic">◉</div><div class="k-lbl">Active Sites</div><div class="k-val">${sites}<span style="font-size:15px;color:var(--muted)"> / ${SITES.length}</span></div></div>
+    <div class="kpi k-slate"><div class="k-ic">◷</div><div class="k-lbl">Latest DPR Date</div><div class="k-val" style="font-size:19px">${esc(last)}</div></div>
+  </div>
+  <div class="charts">
+    <div class="chart-card"><h4>Work Done Amount by Site</h4><div class="chart-box"><canvas id="cSite"></canvas></div></div>
+    <div class="chart-card"><h4>Daily Work Done Trend</h4><div class="chart-box"><canvas id="cTrend"></canvas></div></div>
+    <div class="chart-card"><h4>Top BOQ Items by Amount</h4><div class="chart-box"><canvas id="cItem"></canvas></div></div>
+    <div class="chart-card"><h4>Contribution by Site Engineer</h4><div class="chart-box"><canvas id="cUser"></canvas></div></div>
+  </div>
+  <div class="card"><div class="card-h"><h3>Site-wise Abstract</h3></div>
+    <div class="card-b" id="absTbl"></div></div>`;
+  drawDash();
+  renderAbstract($('#absTbl'));
+}
+function groupSum(list,key){const m={};list.forEach(e=>{const k=e[key]||'—';m[k]=(m[k]||0)+(+e.amount||0);});return m;}
+function destroyCharts(){Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};}
+const PAL=['#f59e0b','#2563eb','#059669','#dc2626','#7c3aed','#0891b2','#db2777','#65a30d','#ea580c','#0f766e','#4f46e5','#b45309','#be123c','#15803d'];
+function drawDash(){
+  if(typeof Chart==='undefined'){ $$('.chart-box').forEach(b=>b.innerHTML='<div class="empty" style="padding:30px">Charts need an internet connection to load.</div>'); return; }
+  destroyCharts();
+  const bs=groupSum(entries,'site');const sKeys=SITES.filter(s=>bs[s]);const sVals=sKeys.map(s=>bs[s]);
+  charts.site=new Chart($('#cSite'),{type:'bar',data:{labels:sKeys,datasets:[{data:sVals,backgroundColor:'#2563eb',borderRadius:5}]},options:barOpts('₹')});
+  const bd={};entries.forEach(e=>{bd[e.date]=(bd[e.date]||0)+(+e.amount||0);});
+  const dKeys=Object.keys(bd).sort();const dVals=dKeys.map(d=>bd[d]);
+  charts.trend=new Chart($('#cTrend'),{type:'line',data:{labels:dKeys,datasets:[{data:dVals,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.15)',fill:true,tension:.3,pointRadius:3}]},options:barOpts('₹')});
+  const bi=groupSum(entries,'itemNo');const iKeys=Object.keys(bi).sort((a,b)=>bi[b]-bi[a]).slice(0,8);const iVals=iKeys.map(k=>bi[k]);
+  charts.item=new Chart($('#cItem'),{type:'bar',data:{labels:iKeys,datasets:[{data:iVals,backgroundColor:PAL,borderRadius:5}]},options:{...barOpts('₹'),indexAxis:'y'}});
+  const bu=groupSum(entries,'user');const uKeys=Object.keys(bu).sort((a,b)=>bu[b]-bu[a]);const uVals=uKeys.map(k=>bu[k]);
+  charts.user=new Chart($('#cUser'),{type:'bar',data:{labels:uKeys,datasets:[{data:uVals,backgroundColor:'#059669',borderRadius:5}]},options:barOpts('₹')});
+}
+function barOpts(prefix){return {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+  tooltip:{callbacks:{label:c=>'  '+(prefix||'')+Number(c.raw).toLocaleString('en-IN',{maximumFractionDigits:0})}}},
+  scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#f1f5f9'},ticks:{font:{size:10},callback:v=>v>=1e7?(v/1e7).toFixed(1)+'Cr':v>=1e5?(v/1e5).toFixed(1)+'L':v}}}};}
+function renderAbstract(root){
+  const bs=groupSum(entries,'site');const cnt={};entries.forEach(e=>cnt[e.site]=(cnt[e.site]||0)+1);
+  const tot=Object.values(bs).reduce((a,b)=>a+b,0)||1;
+  const rows=SITES.map(s=>({s,amt:bs[s]||0,n:cnt[s]||0})).sort((a,b)=>b.amt-a.amt);
+  root.innerHTML=`<div class="tbl-wrap"><table class="dt"><thead><tr><th>Site</th><th class="num">Entries</th><th class="num">Work Done ₹</th><th class="num">% of total</th></tr></thead><tbody>${
+    rows.map(r=>`<tr><td><span class="pill site">${esc(r.s)}</span></td><td class="num">${r.n}</td><td class="num"><b>${fmtNum(r.amt,2)}</b></td><td class="num">${(r.amt/tot*100).toFixed(2)}%</td></tr>`).join('')}
+    <tr style="background:#f8fafc;font-weight:700"><td>Total</td><td class="num">${entries.length}</td><td class="num">${fmtNum(tot,2)}</td><td class="num">100%</td></tr></tbody></table></div>`;
+}
+
+/* ============================================================
+   REPORTS (filters + export)
+   ============================================================ */
+function renderReports(m){
+  m.innerHTML=`
+  <div class="card"><div class="card-h"><h3>Filters</h3><button class="btn btn-ghost btn-sm" id="fClear">Clear filters</button></div>
+    <div class="card-b"><div class="filters">
+      <div class="fg"><label>From date</label><input type="date" class="sel" id="flFrom"></div>
+      <div class="fg"><label>To date</label><input type="date" class="sel" id="flTo"></div>
+      <div class="fg"><label>Site</label><select class="sel" id="flSite"><option value="">All sites</option>${SITES.map(s=>`<option>${esc(s)}</option>`).join('')}</select></div>
+      <div class="fg"><label>Site Engineer</label><select class="sel" id="flUser"><option value="">All engineers</option>${[...ADMINS,...USERS].map(u=>`<option>${esc(u)}</option>`).join('')}</select></div>
+      <div class="fg"><label>BOQ Item</label><select class="sel" id="flItem"><option value="">All items</option>${BOQ.map(b=>`<option value="${esc(b.item)}">${esc(b.item)}</option>`).join('')}</select></div>
+      <div class="fg"><label>Search (particular/desc/remark)</label><input type="text" class="sel" id="flText" placeholder="keyword…"></div>
+    </div></div></div>
+  <div class="kpis" id="rKpis"></div>
+  <div class="card"><div class="card-h"><h3 id="rCount">Results</h3>
+    <div class="toolbar">
+      <button class="btn btn-sm btn-csv" id="eCsv">⬇ CSV</button>
+      <button class="btn btn-sm btn-xls" id="eXls">⬇ Excel</button>
+      <button class="btn btn-sm btn-pdf" id="ePdf">⬇ PDF (print-ready)</button></div></div>
+    <div class="card-b" id="rTbl"></div></div>`;
+  const ids=['flFrom','flTo','flSite','flUser','flItem','flText'];
+  ids.forEach(id=>$('#'+id).addEventListener('input',applyFilters));
+  $('#fClear').onclick=()=>{ids.forEach(id=>$('#'+id).value='');applyFilters();};
+  applyFilters();
+}
+function currentFilter(){
+  const f={from:$('#flFrom')?.value,to:$('#flTo')?.value,site:$('#flSite')?.value,user:$('#flUser')?.value,item:$('#flItem')?.value,text:($('#flText')?.value||'').toLowerCase()};
+  return entries.filter(e=>{
+    if(f.from&&(e.date||'')<f.from)return false;
+    if(f.to&&(e.date||'')>f.to)return false;
+    if(f.site&&e.site!==f.site)return false;
+    if(f.user&&e.user!==f.user)return false;
+    if(f.item&&e.itemNo!==f.item)return false;
+    if(f.text&&!((partOf(e))+' '+(descOf(e))+' '+(e.remark||'')).toLowerCase().includes(f.text))return false;
+    return true;
+  });
+}
+function applyFilters(){
+  const list=currentFilter();
+  const tot=list.reduce((s,e)=>s+(+e.amount||0),0);
+  const qty=list.reduce((s,e)=>s+(+e.qty||0),0);
+  const sites=new Set(list.map(e=>e.site)).size;
+  $('#rKpis').innerHTML=`
+    <div class="kpi k-amber"><div class="k-lbl">Filtered Amount</div><div class="k-val">${fmtMoney(tot)}</div></div>
+    <div class="kpi k-blue"><div class="k-lbl">Records</div><div class="k-val">${list.length}</div></div>
+    <div class="kpi k-green"><div class="k-lbl">Total Qty</div><div class="k-val" style="font-size:20px">${fmtNum(qty,2)}</div></div>
+    <div class="kpi k-slate"><div class="k-lbl">Sites in view</div><div class="k-val">${sites}</div></div>`;
+  $('#rCount').textContent=`Results · ${list.length} records`;
+  const root=$('#rTbl');root.innerHTML=rowsHTML(list,true);wireRowActions(root);
+  $('#eCsv').onclick=()=>exportCSV(list,'DPR_Report');
+  $('#eXls').onclick=()=>exportXLSX(list,'DPR_Report');
+  $('#ePdf').onclick=()=>exportPDF(list,'DPR Report');
+}
+
+/* ============================================================
+   EXPORTS
+   ============================================================ */
+const EXP_COLS=[['date','Date'],['srNo','Sr No'],['site','Site'],['user','By'],['itemNo','Item No'],['particular','Particular'],['description','BOQ Description'],
+  ['unit','Unit'],['boqQty','BOQ Qty'],['rate','Rate'],['n1','N1'],['n2','N2'],['n3','N3'],['coeff','Coeff'],['length','Length'],['width','Width'],
+  ['height','Height'],['qty','Qty'],['amount','Amount'],['remark','Remark']];
+function cellVal(e,key){
+  if(key==='particular')return partOf(e);
+  if(key==='description')return descOf(e);
+  return e[key]!=null?e[key]:'';
+}
+function rowsForExport(list){return list.map(e=>EXP_COLS.map(c=>cellVal(e,c[0])));}
+function saveFile(filename,blob){
+  try{const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);toast('Downloaded: '+filename,'ok');}
+  catch(e){toast('Download failed in this browser','err');}
+}
+function exportCSV(list,name){
+  if(!list.length){toast('Nothing to export','warn');return;}
+  const head=EXP_COLS.map(c=>c[1]);
+  const lines=[head.join(',')].concat(rowsForExport(list).map(r=>r.map(v=>{v=String(v).replace(/"/g,'""');return /[",\n]/.test(v)?`"${v}"`:v;}).join(',')));
+  saveFile(name+'_'+todayISO()+'.csv',new Blob([lines.join('\n')],{type:'text/csv'}));
+}
+function exportXLSX(list,name){
+  if(!list.length){toast('Nothing to export','warn');return;}
+  if(typeof XLSX==='undefined'){toast('Excel library still loading…','warn');return;}
+  const aoa=[EXP_COLS.map(c=>c[1])].concat(rowsForExport(list));
+  const ws=XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols']=EXP_COLS.map(c=>({wch:c[0]==='particular'?34:c[0]==='description'?26:c[0]==='remark'?18:11}));
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'DPR');
+  const buf=XLSX.write(wb,{type:'array',bookType:'xlsx'});
+  saveFile(name+'_'+todayISO()+'.xlsx',new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+}
+function exportPDF(list,title){
+  if(!list.length){toast('Nothing to export','warn');return;}
+  if(!window.jspdf){toast('PDF library still loading…','warn');return;}
+  const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape',unit:'pt',format:'a4'});
+  doc.setFontSize(15);doc.setTextColor(15,23,42);doc.text('PragatiSetu — '+title,40,38);
+  doc.setFontSize(9);doc.setTextColor(100);doc.text('JCC Infraprojects · FOB Daily DPR · Generated '+new Date().toLocaleString('en-IN'),40,54);
+  const tot=list.reduce((s,e)=>s+(+e.amount||0),0);
+  const cols=['Date','Site','By','Item','Particular','Unit','Qty','Rate','Amount'];
+  const body=list.map(e=>[e.date,e.site,e.user||'',e.itemNo,partOf(e).slice(0,30),e.unit,fmtNum(e.qty,2),fmtNum(e.rate,2),fmtNum(e.amount,2)]);
+  doc.autoTable({head:[cols],body,startY:66,styles:{fontSize:7.5,cellPadding:3},headStyles:{fillColor:[37,99,235]},
+    alternateRowStyles:{fillColor:[248,250,252]},columnStyles:{6:{halign:'right'},7:{halign:'right'},8:{halign:'right'}},
+    foot:[['','','','','','','','Total ₹',fmtNum(tot,2)]],footStyles:{fillColor:[241,245,249],textColor:[15,23,42],fontStyle:'bold',halign:'right'}});
+  saveFile(title.replace(/[^a-z0-9]+/gi,'_')+'_'+todayISO()+'.pdf',doc.output('blob'));
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+function boot(){
+  buildLogin();
+  $('#logoutBtn').addEventListener('click',logout);
+  $('#hamb').addEventListener('click',()=>{$('#sidebar').classList.add('open');$('#scrim').classList.remove('hidden');});
+  $('#scrim').addEventListener('click',closeSide);
+  try{const s=JSON.parse(localStorage.getItem(LS_SESSION)||'null');
+    if(s&&s.name&&[...ADMINS,...USERS].includes(s.name)){session=s;openShell();}}catch(e){}
+  initBackend();
+}
+boot();
+</script>
+</body>
+</html>
