@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PragatiSetu — Daily DPR Management System</title>
+<title>DPR Tracker — Daily DPR Management System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -191,12 +191,12 @@ table.dt td.num,table.dt th.num{text-align:right;font-variant-numeric:tabular-nu
 <div id="login">
   <div class="login-card">
     <div class="brand">
-      <div class="logo">PS</div>
-      <div><h1>PragatiSetu</h1><div class="sub">Daily DPR Management System · JCC Infraprojects</div></div>
+      <div class="logo">DT</div>
+      <div><h1>DPR Tracker</h1><div class="sub">Daily DPR Management System · JCC Infraprojects</div></div>
     </div>
-    <p class="lead">Select your name to open your DPR workspace. Site engineers see and manage their own entries; admins get the full command centre.</p>
+    <p class="lead">Type your own name to open your workspace. Site engineers see and manage only their own entries; admins get the full command centre and user control.</p>
     <label class="fld" for="loginName">Your Name</label>
-    <select id="loginName" class="sel"><option value="">— Select your name —</option></select>
+    <input id="loginName" class="sel" type="text" autocomplete="off" placeholder="Type your full name (e.g. Vikas Saini)">
     <div id="roleLine" class="role-hint"></div>
     <button id="loginBtn" class="btn btn-primary btn-block">Enter Workspace →</button>
     <div class="role-hint">FOB 14-Site Project · BOQ Item-wise Daily Progress</div>
@@ -207,8 +207,8 @@ table.dt td.num,table.dt th.num{text-align:right;font-variant-numeric:tabular-nu
 <div id="shell" class="hidden">
   <aside class="sidebar" id="sidebar">
     <div class="sb-brand">
-      <div class="logo">PS</div>
-      <div><h1>PragatiSetu</h1><div class="sub">Daily DPR System</div></div>
+      <div class="logo">DT</div>
+      <div><h1>DPR Tracker</h1><div class="sub">Daily DPR System</div></div>
     </div>
     <nav class="sb-nav" id="navLinks"></nav>
     <div class="sb-user">
@@ -237,15 +237,24 @@ table.dt td.num,table.dt th.num{text-align:right;font-variant-numeric:tabular-nu
 
 <script>
 /* ============================================================
-   PragatiSetu — Daily DPR Management System
+   DPR Tracker — Daily DPR Management System
    JCC Infraprojects · FOB 14-site BOQ item-wise DPR
    ============================================================ */
 
 const BOQ = [{"item":"13041","desc":"Portable fencing along running track","unit":"M","qty":200.0,"rate":258.222806},{"item":"13051","desc":"3 horizontal bamboo Barricating","unit":"M","qty":3500.0,"rate":151.265574},{"item":"41011","desc":"Plate/Semi Through/Composite Girder","unit":"MT","qty":1810.2,"rate":134838.341656},{"item":"41011(A)","desc":"Girder material receipt stage 40%","unit":"MT","qty":0,"rate":0},{"item":"41011(B)","desc":"Girder fabrication stage 20%","unit":"MT","qty":0,"rate":0},{"item":"41011(C)","desc":"Girder erection/launching stage 20%","unit":"MT","qty":0,"rate":0},{"item":"41011(D)","desc":"Girder completion stage 20%","unit":"MT","qty":0,"rate":0},{"item":"41013","desc":"Extra for E350 steel","unit":"MT","qty":1810.2,"rate":4612.403672},{"item":"41014","desc":"Deduction for Quality BR","unit":"MT","qty":0.0,"rate":-365.853892},{"item":"41020","desc":"HSFG bolts with DTI washers","unit":"KG","qty":52043.0,"rate":176.22747},{"item":"41041","desc":"Metallizing of new girder","unit":"SQM","qty":80804.0,"rate":757.021256},{"item":"41060","desc":"MS angles for stair nosing","unit":"KG","qty":20828.0,"rate":119.369818},{"item":"41300","desc":"Assembling/erecting prefabricated FOB structures","unit":"MT","qty":0.0,"rate":8470.49127},{"item":"41301","desc":"Extra over 41300 under traffic/power block","unit":"MT","qty":0.0,"rate":272.988998},{"item":"41321","desc":"Launching prefabricated steel/PSC girders","unit":"MT","qty":0.0,"rate":1424.917996},{"item":"211201","desc":"JCB Backhoe Loader","unit":"Hr","qty":0.0,"rate":272.988998},{"item":"1.1.11.1","desc":"CARRIAGE OF MATERIALS -1km","unit":"MT","qty":150.0,"rate":125.058633},{"item":"1.1.11.2","desc":"CARRIAGE OF MATERIALS -2km","unit":"MT","qty":50.0,"rate":141.407504},{"item":"2.33.2","desc":"Tree Cutting Beyond 60 cm girth upto and including 120 cm girth","unit":"Each","qty":4.0,"rate":1908.002049},{"item":"2.33.3","desc":"Tree Cutting Beyond 120 cm girth upto and including 240 cm girth","unit":"Each","qty":12.0,"rate":8855.931336},{"item":"2.33.4","desc":"Tree Cutting Above 240 cm girth","unit":"Each","qty":2.0,"rate":17741.694246},{"item":"2.7.1","desc":"Excavation Ordinary rock","unit":"cum","qty":2000.0,"rate":402.58},{"item":"2.25","desc":"Filling available excavated earth (excluding rock) in trenches, plinth, sides of foundations etc","unit":"cum","qty":23000.0,"rate":247.572808},{"item":"2.25A","desc":"Excavating, supplying and filling of local earth (including royalty) by mechanical transport upto a lead of 5km .","unit":"cum","qty":100.0,"rate":359.392461},{"item":"2.26.1","desc":"All kinds of soil","unit":"cum","qty":14877.0,"rate":101.875796},{"item":"2.27","desc":"Supplying and filling in plinth with complete.","unit":"cum","qty":2029.0,"rate":2106.927946},{"item":"2.6.1","desc":"Excavation All kinds of soil","unit":"cum","qty":30951.3,"rate":200.29074},{"item":"4.1.3","desc":"PCC Concrete 1:2:4","unit":"cum","qty":500.0,"rate":7180.196353},{"item":"4.1.5","desc":"PCC Concrete 1:3:6","unit":"cum","qty":1500.0,"rate":6661.799659},{"item":"4.20.1.2","desc":"PCC Concrete of M15 grade cement content of 240 kg /cum","unit":"cum","qty":175.0,"rate":7969.465678},{"item":"4.3.1","desc":"PCC Foundations, footings, bases for columns","unit":"Sqm","qty":1000.0,"rate":300.21676},{"item":"5.1.2","desc":"RCC 1:1.5:3","unit":"cum","qty":30.0,"rate":8154.15821},{"item":"5.11.1","desc":"RCC Suspended floors, roofs, landing, beams and balconies","unit":"Sqm","qty":2000.0,"rate":311.232994},{"item":"5.2.2","desc":"RCC 1:1.5:3","unit":"cum","qty":50.0,"rate":9929.283024},{"item":"5.22.6","desc":"Thermo-Mechanically  upto plinth level Fe-500D or more.","unit":"Kg","qty":945000.0,"rate":87.398709},{"item":"5.22A.6","desc":"Thermo-Mechanically  above plinth level. Fe-500D or more.","unit":"Kg","qty":354351.0,"rate":87.398709},{"item":"5.33.1.1","desc":"Concrete of M25 grade with  minimum cement content of 330 kg /cum","unit":"cum","qty":3800.0,"rate":8465.732414},{"item":"5.33.1.2","desc":"Concrete of M30 grade with  minimum cement  content of 350 kg /cum","unit":"cum","qty":2846.0,"rate":8603.727811},{"item":"5.33.2.1","desc":"Concrete of M25 grade with  minimum cement  content of 330 kg /cum","unit":"cum","qty":140.0,"rate":10047.390706},{"item":"5.33.2.2","desc":"Concrete of M30 grade with  minimum cement  content of 350 kg /cum","unit":"cum","qty":1799.0,"rate":10214.632742},{"item":"5.33.2.3","desc":"Concrete of M35 grade with  minimum cement  content of 370 kg /cum","unit":"cum","qty":1118.0,"rate":10323.430243},{"item":"5.35","desc":"Add for using extra cement in the items of design mix over and above the specified cement content therein.","unit":"Quintal","qty":1200.0,"rate":671.161644},{"item":"5.9.1","desc":"Foundations, footings, bases of columns, etc. for mass concrete","unit":"Sqm","qty":6000.0,"rate":300.21676},{"item":"5.9.2","desc":"Walls (any thickness) including attached pilasters, butteresses, plinth and string courses etc.","unit":"Sqm","qty":600.0,"rate":652.73626},{"item":"5.9.3","desc":"Suspended floors, roofs, landings, balconies and access platform","unit":"Sqm","qty":8820.0,"rate":747.300396},{"item":"5.9.5","desc":"Lintels, beams, plinth beams, girders, bressumers and cantilevers","unit":"Sqm","qty":500.0,"rate":593.073115},{"item":"5.9.6","desc":"Columns, Pillars, Piers, Abutments, Posts and Struts","unit":"Sqm","qty":6800.0,"rate":784.053674},{"item":"5.9.7","desc":"Stairs, (excluding landings) except spiral-staircases","unit":"Sqm","qty":3216.88,"rate":641.232582},{"item":"6.1.2","desc":"Brick Work Cement mortar 1:6 (1 cement : 6 coarse sand)","unit":"cum","qty":150.0,"rate":6491.048026},{"item":"6.4.2","desc":"Brick Work Cement mortar 1:6 (1 cement : 6 coarse sand)","unit":"cum","qty":50.0,"rate":8080.212955},{"item":"7.1.1","desc":"Stone Work Cement mortar 1:6 (1 cement : 6 coarse sand)","unit":"cum","qty":506.0,"rate":6486.368564},{"item":"7.2.1","desc":"Stone WorkCement mortar 1:6 (1 cement : 6 coarse sand)","unit":"cum","qty":150.0,"rate":8067.880622},{"item":"10.1","desc":"Structural steel single sections","unit":"KG","qty":3000.0,"rate":90.713328},{"item":"10.2","desc":"Structural steel built-up sections","unit":"KG","qty":1800000.0,"rate":109.138712},{"item":"10.16.1","desc":"Hot finished welded tubular sections","unit":"KG","qty":650000.0,"rate":151.010151},{"item":"10.19","desc":"Holding-down bolts with nuts/washer plates","unit":"KG","qty":70835.0,"rate":86.277588},{"item":"10.20","desc":"Bolts with nuts and washers","unit":"KG","qty":2000.0,"rate":136.630553},{"item":"11.20.3","desc":"Chequered precast cement concrete tiles 22 mm","unit":"SQM","qty":9529.0,"rate":959.241048},{"item":"11.26.1","desc":"Kota stone flooring 25 mm","unit":"SQM","qty":1663.7439,"rate":1576.0},{"item":"11.55.1","desc":"Providing and fixing flame-finished granite stone slabs (Jet Black/Cherry Red/Elite Brown/Cat Eye or equivalent)","unit":"SQM","qty":3634.0,"rate":2524.862431},{"item":"11.56.1","desc":"Polished Granite stone slab colour of Black, Cherry/Ruby Red or equivalent","unit":"SQM","qty":2207.0,"rate":3810.642214},{"item":"12.41.2","desc":"110 mm diameter","unit":"M","qty":4530.0,"rate":311.720438},{"item":"12.42.5.2","desc":"110 mm bend","unit":"JOB","qty":42.0,"rate":128.685216},{"item":"12.42.6.2","desc":"110 mm Shoe","unit":"JOB","qty":42.0,"rate":113.038264},{"item":"12.43.2","desc":"110 mm","unit":"JOB","qty":200.0,"rate":301.727836},{"item":"12.5","desc":"Providing and fixing 0.50 mm thick precoated GI profile sheets with 120 GSM zinc coating","unit":"SQM","qty":16003.0,"rate":654.686036},{"item":"12.51.1","desc":"Ridges plain (500 - 600mm)","unit":"M","qty":2321.0,"rate":439.284533},{"item":"12.51.6","desc":"Gutter (600 mm over all girth)","unit":"M","qty":300.0,"rate":1082.710613},{"item":"13.2.2","desc":"1:6 (1 cement: 6 fine sand)","unit":"SQM","qty":600.0,"rate":316.156178},{"item":"13.3.2","desc":"1:6 (1 cement: 6 fine sand)","unit":"SQM","qty":2021.0,"rate":372.504705},{"item":"13.61.1","desc":"Two or more coats on new work","unit":"SQM","qty":2500.0,"rate":128.149028},{"item":"13.63.1","desc":"Two or more coats on new work","unit":"SQM","qty":15000.0,"rate":118.400148},{"item":"15.18","desc":"Demolishing   brick   work Dismantling steel work in built up sections in .","unit":"Kg","qty":200000.0,"rate":4.533229},{"item":"15.2.1","desc":"Nominal concrete 1:3:6","unit":"cum","qty":1840.0,"rate":1956.697705},{"item":"15.2.2","desc":"Nominal concrete 1:4:8","unit":"cum","qty":0.0,"rate":1208.471165},{"item":"15.2","desc":"Extra for dismantling trusses, rafters, purlins etc","unit":"kg/M","qty":90538.0,"rate":0.682422},{"item":"15.23.1","desc":"Dismantling tile work in floors For thickness of tiles 10 mm to 25 mm","unit":"Sqm","qty":6000.0,"rate":58.980724},{"item":"15.25","desc":"Dismantling roofing Dismantling stone slab flooring laid in cement mortar.","unit":"Sqm","qty":3819.0,"rate":214.231638},{"item":"15.28.1","desc":"G.S. Sheet","unit":"Sqm","qty":1000.0,"rate":132.584768},{"item":"15.28.2","desc":"Asbestos Cement sheet","unit":"Sqm","qty":400.0,"rate":62.14911},{"item":"15.3","desc":"Demolishing R.C.C. work manually/ by mechanical.","unit":"cum","qty":961.2,"rate":2854.569553},{"item":"15.43.2","desc":"bituminous road","unit":"Sqm","qty":1400.0,"rate":344.769141},{"item":"15.6","desc":"Disposal of building rubbish / malba / similar unserviceable","unit":"cum","qty":3871.0,"rate":213.841683},{"item":"15.7.4","desc":"Demolishing   brick   work In cement mortar","unit":"cum","qty":451.6,"rate":1655.798524},{"item":"15.10.2","desc":"Demolishing   brick   work  In cement mortar","unit":"cum","qty":200.0,"rate":2312.726802},{"item":"15.13.1","desc":"Demolishing   brick   work  Of area 3 sq. metres and below","unit":"Each","qty":16.0,"rate":115.32925},{"item":"15.13.2","desc":"Demolishing   brick   work  Of area beyond 3 sq. metres","unit":"Each","qty":15.0,"rate":151.838806},{"item":"15.40.2","desc":"Thickness above 40 mm up to 75 mm","unit":"Sqm","qty":10.0,"rate":348.619949},{"item":"15.52","desc":"Dismantling of flushing cistern of all types (C.I./PVC/Vitrious China) including stacking of useful materials near the site and disposal of unserviceable materials within 50 metres lead.","unit":"Each","qty":2.0,"rate":725.901605},{"item":"15.57","desc":"Dismantling aluminium/ Gypsum partitions, doors, windows, fixed glazing and false ceiling including disposal of unserviceable material and stacking of serviceable material with in 50 meters lead as directed by Engineer-in-charge.","unit":"Sqm","qty":5.0,"rate":45.332292},{"item":"15.9.2","desc":"Demolishing   brick   work  In cement mortar","unit":"cum","qty":400.0,"rate":1976.195465},{"item":"16.78.3","desc":"ROAD WORK With material conforming to Grade-III","unit":"cum","qty":500.0,"rate":2547.3336},{"item":"16.81","desc":"Providing and erecting 2.00 m high temporary MS barricading with MS angle/tube frame, 1.63 mm MS sheet, 30 × 5 mm flat and ISLC 75 supports, including fixing, welding/riveting, complete.","unit":"M","qty":500.0,"rate":2756.398331},{"item":"26.65","desc":"Galvanized steel deck sheet permanent shuttering","unit":"SQM","qty":6300.0,"rate":1589.457395},{"item":"NS-1","desc":"Protective Screen on FOB/ROB complete With All respect.","unit":"KG","qty":133119.0,"rate":129.51062},{"item":"NS-2","desc":"Schedule C decking system / roof ceiling","unit":"SQM","qty":6594.0,"rate":1598.982},{"item":"NS-3","desc":"Extra launching under traffic/power block","unit":"MT","qty":386.9813,"rate":1718.0},{"item":"NS-4","desc":"Deduction for E350 Quality A in lieu of Quality B0 as per IS:2062.","unit":"MT","qty":-1624.0673,"rate":0.0},{"item":"NS-5","desc":"Design of FOB . approved agency as per Railway requirements.","unit":"JOB","qty":220420.6516,"rate":0.0},{"item":"NS-NEW-1","desc":"Third-party girder fabrication inspection","unit":"MT","qty":0.0,"rate":1808.36},{"item":"NS-NEW-2","desc":"Delaunching/launching by 140/160 MT crane","unit":"MT","qty":0.0,"rate":23315.79},{"item":"NS-NEW-3","desc":"Extra over 10.2 for tubular box section","unit":"KG","qty":0.0,"rate":26.2},{"item":"NS-NEW-4","desc":"GAD/TAD preparation","unit":"JOB","qty":0.0,"rate":20000.0},{"item":"NS-NEW-5","desc":"Precast RCC work up to 15 m","unit":"CUM","qty":0.0,"rate":8186.82},{"item":"NS-NEW-6","desc":"FOSROC Conbextra GP2 grout","unit":"CUM","qty":0.0,"rate":53100.0}];
 
 const SITES = ["Beawar","Sojat","Marwar","Falna","Jawai Bandh","Pindwara","Bijaynagar","Bhilwara","Kapasan","Mavli","Fatehnagar","Dungarpur","Someshwar","Ranapratap"];
-const ADMINS = ["Vimlesh Tailor","Akshita Bansal"];
-const USERS  = ["Abid","Vikas Saini","Vikas Kumar","Chandrakant","Hardev","Sujan","Sheshnath","Umesh","M.K. Meena","Rajesh Jatav","Tikkam Chand","Biram Gurjar"];
+// default roster, used to seed the backend on first run and for local-only mode
+const DEFAULT_USERS = [
+  {name:"Vimlesh Tailor",role:"admin"},{name:"Akshita Bansal",role:"admin"},
+  {name:"Abid",role:"site"},{name:"Vikas Saini",role:"site"},{name:"Vikas Kumar",role:"site"},
+  {name:"Chandrakant",role:"site"},{name:"Hardev",role:"site"},{name:"Sujan",role:"site"},
+  {name:"Sheshnath",role:"site"},{name:"Umesh",role:"site"},{name:"M.K. Meena",role:"site"},
+  {name:"Rajesh Jatav",role:"site"},{name:"Tikkam Chand",role:"site"},{name:"Biram Gurjar",role:"site"}
+];
+let USERS_DB = [];   // live roster (from backend, else local)
+function findUser(name){const n=String(name||'').trim().toLowerCase();return USERS_DB.find(u=>u.name.trim().toLowerCase()===n);}
+function engineerNames(){return USERS_DB.map(u=>u.name);}
 
 /* ===========================================================
    BACKEND CONFIG  —  PASTE YOUR GOOGLE APPS SCRIPT URL BELOW
@@ -255,7 +264,7 @@ const USERS  = ["Abid","Vikas Saini","Vikas Kumar","Chandrakant","Hardev","Sujan
 const API_URL = "https://script.google.com/macros/s/AKfycbxgN9MdmTgI4aMXoOaveuRBBEHSivmt5cUfd1dsoUFmTWq7pC4NRS0dV3ZQiqIZUIMFAw/exec";
 const POLL_MS = 15000;   // auto-refresh interval when online
 
-const LS_SESSION='pragatisetu_session', LS_ENTRIES='pragatisetu_entries';
+const LS_SESSION='dprtracker_session', LS_ENTRIES='dprtracker_entries', LS_USERS='dprtracker_users';
 
 let online=false, pollTimer=null, syncMode='off';
 let entries=[];          // all entries (cache)
@@ -337,7 +346,11 @@ async function refresh(silent){
 }
 async function initBackend(){
   online = !!API_URL && /^https?:\/\//.test(API_URL);
-  if(online){ await refresh(false); if(pollTimer)clearInterval(pollTimer); pollTimer=setInterval(()=>refresh(true),POLL_MS); }
+  await loadUsers();
+  // restore a previous session only if that name is still a registered user
+  try{const s=JSON.parse(localStorage.getItem(LS_SESSION)||'null');
+    if(s&&s.name){const u=findUser(s.name); if(u){session={name:u.name,role:u.role};openShell();}}}catch(e){}
+  if(online){ await refresh(session?true:false); if(pollTimer)clearInterval(pollTimer); pollTimer=setInterval(()=>refresh(true),POLL_MS); }
   else { cacheLoad(); setSync('off'); if(session)renderTab(); }
 }
 async function addEntry(obj){
@@ -365,30 +378,65 @@ function visibleEntries(){
   return session.role==='admin'?entries:entries.filter(e=>e.user===session.name);
 }
 
+/* ---------- USER ROSTER (admin-managed, backend-synced) ---------- */
+function usersCacheSave(){try{localStorage.setItem(LS_USERS,JSON.stringify(USERS_DB));}catch(e){}}
+function usersCacheLoad(){
+  try{const u=JSON.parse(localStorage.getItem(LS_USERS)||'null');if(Array.isArray(u)&&u.length)return u;}catch(e){}
+  return DEFAULT_USERS.map(x=>({name:x.name,role:x.role}));
+}
+async function loadUsers(){
+  if(online){
+    try{
+      const r=await fetch(API_URL+'?action=users&t='+Date.now(),{method:'GET'});
+      const j=await r.json();
+      const list=(j.users||[]).map(u=>({name:String(u.name||'').trim(),role:(u.role==='admin'?'admin':'site')})).filter(u=>u.name);
+      USERS_DB = list.length?list:DEFAULT_USERS.map(x=>({name:x.name,role:x.role}));
+    }catch(e){ USERS_DB=usersCacheLoad(); }
+  } else { USERS_DB=usersCacheLoad(); }
+  usersCacheSave();
+}
+async function addUserRec(name,role){
+  name=String(name||'').trim(); role=(role==='admin'?'admin':'site');
+  if(!name){toast('Enter a name','warn');return false;}
+  if(findUser(name)){toast('That name already exists','warn');return false;}
+  if(online){ try{ const r=await apiPost('addUser',{name,role}); if(r&&r.users)USERS_DB=r.users.map(u=>({name:String(u.name).trim(),role:(u.role==='admin'?'admin':'site')})); }
+    catch(e){ toast('Add failed — check internet / backend','err'); return false; } }
+  else { USERS_DB.push({name,role}); }
+  usersCacheSave(); return true;
+}
+async function removeUserRec(name){
+  if(online){ try{ const r=await apiPost('removeUser',{name}); if(r&&r.users)USERS_DB=r.users.map(u=>({name:String(u.name).trim(),role:(u.role==='admin'?'admin':'site')})); }
+    catch(e){ toast('Remove failed — check internet / backend','err'); return false; } }
+  else { USERS_DB=USERS_DB.filter(u=>u.name!==name); }
+  usersCacheSave(); return true;
+}
+
 /* ============================================================
    LOGIN
    ============================================================ */
 function buildLogin(){
-  const sel=$('#loginName');
-  sel.insertAdjacentHTML('beforeend',
-    '<optgroup label="Administrators">'+ADMINS.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')+'</optgroup>'+
-    '<optgroup label="Site Engineers">'+USERS.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')+'</optgroup>');
-  sel.addEventListener('change',()=>{
-    const n=sel.value,line=$('#roleLine');
-    if(!n){line.innerHTML='';return;}
-    const role=ADMINS.includes(n)?'admin':'site';
-    line.innerHTML= role==='admin'
-      ? `Signing in as <b>${esc(n)}</b> <span class="role-badge badge-admin">ADMIN · full access</span>`
-      : `Signing in as <b>${esc(n)}</b> <span class="role-badge badge-site">SITE · your entries</span>`;
-  });
-  $('#loginBtn').addEventListener('click',()=>{
-    const n=$('#loginName').value;
-    if(!n){toast('Please select your name','warn');return;}
-    doLogin(n);
-  });
+  const inp=$('#loginName'),line=$('#roleLine');
+  const hint=()=>{
+    const n=inp.value.trim();if(!n){line.innerHTML='';return;}
+    const u=findUser(n);
+    if(!u){line.innerHTML=`<span style="color:#b45309">Name not registered yet — ask an admin to add you.</span>`;return;}
+    line.innerHTML= u.role==='admin'
+      ? `Signing in as <b>${esc(u.name)}</b> <span class="role-badge badge-admin">ADMIN · full access</span>`
+      : `Signing in as <b>${esc(u.name)}</b> <span class="role-badge badge-site">SITE · your entries</span>`;
+  };
+  inp.addEventListener('input',hint);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin();});
+  $('#loginBtn').addEventListener('click',tryLogin);
 }
-function doLogin(name){
-  session={name,role:ADMINS.includes(name)?'admin':'site'};
+function tryLogin(){
+  const n=$('#loginName').value.trim();
+  if(!n){toast('Please type your name','warn');return;}
+  const u=findUser(n);
+  if(!u){toast('Name not registered. Ask an admin to add you.','err');return;}
+  doLogin(u.name,u.role);
+}
+function doLogin(name,role){
+  session={name,role};
   try{ localStorage.setItem(LS_SESSION,JSON.stringify(session)); }catch(e){}
   openShell();
 }
@@ -402,7 +450,7 @@ function logout(){
    SHELL + NAV
    ============================================================ */
 const SITE_NAV=[{k:'entry',ic:'✎',t:'New DPR Entry'},{k:'mine',ic:'▦',t:'My Entries'}];
-const ADMIN_NAV=[{k:'dash',ic:'◈',t:'Dashboard'},{k:'all',ic:'▦',t:'All Entries'},{k:'add',ic:'✎',t:'Add Entry'},{k:'reports',ic:'⇩',t:'Reports & Export'}];
+const ADMIN_NAV=[{k:'dash',ic:'◈',t:'Dashboard'},{k:'all',ic:'▦',t:'All Entries'},{k:'add',ic:'✎',t:'Add Entry'},{k:'reports',ic:'⇩',t:'Reports & Export'},{k:'users',ic:'⚇',t:'Manage Users'}];
 
 function openShell(){
   $('#login').classList.add('hidden');$('#shell').classList.remove('hidden');
@@ -424,7 +472,8 @@ function renderTab(){
   if(!session)return;
   const titles={entry:['New DPR Entry','Log today\'s item-wise progress'],mine:['My Entries','Your submitted DPR records'],
     dash:['Dashboard','Up-to-date progress across all 14 sites'],all:['All Entries','Every DPR record from all site engineers'],
-    add:['Add Entry','Create a DPR record'],reports:['Reports & Export','Filter, analyse and download']};
+    add:['Add Entry','Create a DPR record'],reports:['Reports & Export','Filter, analyse and download'],
+    users:['Manage Users','Add or remove people who can log in']};
   const t=titles[activeTab]||['',''];
   $('#pageTitle').textContent=t[0];$('#pageCrumb').textContent=t[1];
   const m=$('#main');
@@ -434,6 +483,7 @@ function renderTab(){
   else if(activeTab==='all')renderAll(m);
   else if(activeTab==='add')renderMultiEntry(m,true);
   else if(activeTab==='reports')renderReports(m);
+  else if(activeTab==='users')renderUsers(m);
 }
 function closeSide(){$('#sidebar').classList.remove('open');$('#scrim').classList.add('hidden');}
 
@@ -560,7 +610,17 @@ function collectEntries(){
 function renderMultiEntry(m, isAdmin){
   const nextSr=(isAdmin?entries.length:visibleEntries().length)+1;
   m.innerHTML=`
-  <div class="section-note">💡 Set <b>Date</b> &amp; <b>Site</b> once, then add one or more BOQ items with the <b>＋</b> button. Select a BOQ Item No. → Particular, Unit, BOQ Qty &amp; Rate auto-fill. <b>Qty = N1 × N2 × N3 × Coefficient × Length × Width × Height</b> · Amount = Qty × Rate.</div>
+  <div class="card" style="border:1.5px solid #bfdbfe">
+    <div class="card-h"><h3>⬆ Bulk Import from Excel</h3>
+      <div class="toolbar">
+        <button class="btn btn-sm btn-ghost" id="tplBtn">⬇ Download Excel Template</button>
+        <button class="btn btn-sm btn-blue" id="impBtn">📄 Choose Excel File</button>
+        <input type="file" id="impFile" accept=".xlsx,.xls,.csv" style="display:none">
+      </div></div>
+    <div class="card-b" style="padding-top:14px;color:var(--muted);font-size:12.5px">
+      Fill the template (Date, Site, BOQ Item No, N1, N2, N3, Coefficient, Length, Width, Height, BOQ Description, Remark${isAdmin?', User':''}) and upload it — all rows import at once with Qty &amp; Amount auto-calculated. BOQ Item No, Site${isAdmin?' and User':''} must match the reference tabs in the template.
+    </div></div>
+  <div class="section-note">💡 Or add manually: set <b>Date</b> &amp; <b>Site</b> once, then add one or more BOQ items with the <b>＋</b> button. Select a BOQ Item No. → Particular, Unit, BOQ Qty &amp; Rate auto-fill. <b>Qty = N1 × N2 × N3 × Coefficient × Length × Width × Height</b> · Amount = Qty × Rate.</div>
   <div class="card"><div class="card-h"><h3>${isAdmin?'Add DPR Entry':'New DPR Entry · '+esc(session.name)}</h3></div>
     <div class="card-b">
       ${headerMarkup({srNo:nextSr})}
@@ -583,6 +643,161 @@ function renderMultiEntry(m, isAdmin){
     if(n){toast(n>1?`${n} BOQ items saved`:'DPR entry saved','ok');renderMultiEntry(m,isAdmin);}
   });
   $('#resetBtn').addEventListener('click',()=>renderMultiEntry(m,isAdmin));
+  // import wiring
+  $('#tplBtn').addEventListener('click',()=>downloadTemplate());
+  $('#impBtn').addEventListener('click',()=>$('#impFile').click());
+  $('#impFile').addEventListener('change',e=>{const f=e.target.files[0];if(f)handleImportFile(f,isAdmin);e.target.value='';});
+}
+
+/* ============================================================
+   EXCEL IMPORT (bulk entries)
+   ============================================================ */
+const IMP_COLS=['Date','Site','BOQ Item No','N1','N2','N3','Coefficient','Length','Width','Height','BOQ Description','Remark','User'];
+function downloadTemplate(){
+  if(typeof XLSX==='undefined'){toast('Excel library still loading…','warn');return;}
+  const wb=XLSX.utils.book_new();
+  const sample=[IMP_COLS,
+    [todayISO(),'Beawar','13051',1,1,1,1,42,1,1,'Main Fdn - bamboo barricading','',session.role==='admin'?session.name:''],
+    [todayISO(),'Mavli','41020',1,1,1,1,500,1,1,'HSFG bolts fixing','',session.role==='admin'?session.name:'']];
+  const ws=XLSX.utils.aoa_to_sheet(sample);
+  ws['!cols']=IMP_COLS.map((c,i)=>({wch:i===10?30:i===0?12:i===1?14:11}));
+  XLSX.utils.book_append_sheet(wb,ws,'DPR Import');
+  // reference tabs
+  const boqRef=[['BOQ Item No','Description','Unit','Rate']].concat(BOQ.map(b=>[b.item,b.desc,b.unit,b.rate]));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(boqRef),'BOQ Reference');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Valid Sites']].concat(SITES.map(s=>[s]))),'Sites');
+  if(session.role==='admin')
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Valid Users','Role']].concat(USERS_DB.map(u=>[u.name,u.role]))),'Users');
+  const buf=XLSX.write(wb,{type:'array',bookType:'xlsx'});
+  saveFile('DPR_Import_Template.xlsx',new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+}
+function impDate(v){
+  if(v==null||v==='')return '';
+  if(v instanceof Date)return v.toLocaleDateString('en-CA');
+  if(typeof v==='number'){const d=new Date(Math.round((v-25569)*86400000));return isNaN(d)?'':d.toLocaleDateString('en-CA');}
+  const s=String(v).trim();let m;
+  if(m=s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/))return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  if(m=s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})/))return `${m[3]}-${String(m[2]).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}`;
+  const d=new Date(s);return isNaN(d)?s.slice(0,10):d.toLocaleDateString('en-CA');
+}
+function matchSite(v){const n=String(v||'').trim().toLowerCase();return SITES.find(s=>s.toLowerCase()===n)||'';}
+function matchItem(v){const n=String(v==null?'':v).trim();let b=BOQ.find(x=>x.item===n);if(b)return b;const l=n.toLowerCase();return BOQ.find(x=>x.item.toLowerCase()===l)||null;}
+function handleImportFile(file,isAdmin){
+  if(typeof XLSX==='undefined'){toast('Excel library still loading…','warn');return;}
+  const rd=new FileReader();
+  rd.onload=ev=>{
+    let wb;try{wb=XLSX.read(ev.target.result,{type:'array',cellDates:true});}catch(e){toast('Could not read file','err');return;}
+    const sheetName=wb.SheetNames.find(n=>/import/i.test(n))||wb.SheetNames[0];
+    const rows=XLSX.utils.sheet_to_json(wb.Sheets[sheetName],{header:1,raw:true,defval:''});
+    parseImport(rows,isAdmin);
+  };
+  rd.readAsArrayBuffer(file);
+}
+function parseImport(rows,isAdmin){
+  if(!rows||rows.length<2){toast('No data rows found','warn');return;}
+  // map header → index
+  const head=rows[0].map(h=>String(h||'').trim().toLowerCase());
+  const col=name=>head.findIndex(h=>h===name.toLowerCase());
+  const ci={date:col('Date'),site:col('Site'),item:col('BOQ Item No'),n1:col('N1'),n2:col('N2'),n3:col('N3'),
+    coeff:col('Coefficient'),len:col('Length'),wid:col('Width'),hgt:col('Height'),desc:col('BOQ Description'),rem:col('Remark'),user:col('User')};
+  if(ci.date<0||ci.site<0||ci.item<0){toast('Template headers not found (Date / Site / BOQ Item No)','err');return;}
+  const ok=[],errs=[];const gid=genId();
+  for(let r=1;r<rows.length;r++){
+    const row=rows[r];if(!row||row.every(c=>c===''||c==null))continue;
+    const get=i=>i>=0?row[i]:'';
+    const date=impDate(get(ci.date));const site=matchSite(get(ci.site));const b=matchItem(get(ci.item));
+    const rowNo=r+1;
+    if(!date){errs.push(`Row ${rowNo}: bad/empty Date`);continue;}
+    if(!site){errs.push(`Row ${rowNo}: unknown Site "${get(ci.site)}"`);continue;}
+    if(!b){errs.push(`Row ${rowNo}: unknown BOQ Item "${get(ci.item)}"`);continue;}
+    const n1=num(get(ci.n1),1),n2=num(get(ci.n2),1),n3=num(get(ci.n3),1),c=num(get(ci.coeff),1),
+      L=num(get(ci.len),1),W=num(get(ci.wid),1),H=num(get(ci.hgt),1);
+    const qty=n1*n2*n3*c*L*W*H, amt=qty*(b.rate||0);
+    let who=session.name;
+    if(isAdmin&&ci.user>=0&&String(get(ci.user)||'').trim()){const u=findUser(get(ci.user));if(u)who=u.name;else{errs.push(`Row ${rowNo}: unknown User "${get(ci.user)}"`);continue;}}
+    ok.push({date,srNo:null,site,groupId:gid,itemNo:b.item,particular:b.desc,description:String(get(ci.desc)||'').trim(),
+      unit:b.unit,boqQty:b.qty,rate:b.rate,n1,n2,n3,coeff:c,length:L,width:W,height:H,qty,amount:amt,
+      remark:String(get(ci.rem)||'').trim(),user:who,role:(findUser(who)||{}).role||'site'});
+  }
+  showImportPreview(ok,errs,isAdmin);
+}
+function showImportPreview(ok,errs,isAdmin){
+  const tot=ok.reduce((s,e)=>s+e.amount,0),qty=ok.reduce((s,e)=>s+e.qty,0);
+  const bySite={};ok.forEach(e=>bySite[e.site]=(bySite[e.site]||0)+1);
+  const root=$('#modalRoot');
+  root.innerHTML=`<div class="overlay"><div class="modal"><div class="modal-h"><h3>Import Preview</h3><button class="x" id="mX">✕</button></div>
+    <div class="modal-b">
+      <div class="kpis" style="margin-bottom:14px">
+        <div class="kpi k-green"><div class="k-lbl">Ready to import</div><div class="k-val">${ok.length}</div></div>
+        <div class="kpi k-amber"><div class="k-lbl">Total Amount</div><div class="k-val" style="font-size:20px">${fmtMoney(tot)}</div></div>
+        <div class="kpi k-blue"><div class="k-lbl">Total Qty</div><div class="k-val" style="font-size:20px">${fmtNum(qty,2)}</div></div>
+        <div class="kpi ${errs.length?'k-slate':'k-green'}"><div class="k-lbl">Rows skipped</div><div class="k-val">${errs.length}</div></div>
+      </div>
+      ${errs.length?`<div class="section-note" style="background:#fef2f2;border-color:#fecaca;color:#991b1b"><div><b>${errs.length} row(s) will be skipped:</b><br>${errs.slice(0,8).map(esc).join('<br>')}${errs.length>8?'<br>…and '+(errs.length-8)+' more':''}</div></div>`:''}
+      ${ok.length?`<div class="tbl-wrap" style="max-height:260px;overflow:auto"><table class="dt"><thead><tr><th>Date</th><th>Site</th><th>By</th><th>Item</th><th class="num">Qty</th><th class="num">Amount</th></tr></thead><tbody>${ok.slice(0,50).map(e=>`<tr><td>${esc(e.date)}</td><td>${esc(e.site)}</td><td>${esc(e.user)}</td><td>${esc(e.itemNo)}</td><td class="num">${fmtNum(e.qty,2)}</td><td class="num">${fmtNum(e.amount,2)}</td></tr>`).join('')}</tbody></table>${ok.length>50?`<div style="padding:8px;color:var(--muted)">…and ${ok.length-50} more rows</div>`:''}</div>`:'<div class="empty">No valid rows to import.</div>'}
+      <div class="form-actions">
+        <button class="btn btn-primary" id="impGo" ${ok.length?'':'disabled'}>✓ Import ${ok.length} rows</button>
+        <button class="btn btn-ghost" id="impCancel">Cancel</button>
+      </div>
+    </div></div></div>`;
+  const close=()=>root.innerHTML='';
+  $('#mX').onclick=close;$('#impCancel').onclick=close;
+  $('#impGo').onclick=async()=>{
+    $('#impGo').disabled=true;$('#impGo').textContent='Importing…';
+    const n=await addEntriesBulk(ok);
+    close();
+    if(n){toast(`${n} entries imported`,'ok');renderTab();}
+  };
+}
+async function addEntriesBulk(list){
+  list.forEach(o=>{o.id=genId();o.createdAt=Date.now();});
+  if(online){ try{ await apiPost('addBulk',{entries:list}); }
+    catch(e){ toast('Import save failed — check internet / backend','err'); return 0; } }
+  entries=list.map(normalize).concat(entries);sortEntries();cacheSave();return list.length;
+}
+
+/* ============================================================
+   MANAGE USERS (admin)
+   ============================================================ */
+function renderUsers(m){
+  const rows=USERS_DB.slice().sort((a,b)=>(a.role===b.role?a.name.localeCompare(b.name):(a.role==='admin'?-1:1)));
+  m.innerHTML=`
+  <div class="card"><div class="card-h"><h3>Add a User</h3></div>
+    <div class="card-b"><div class="filters" style="grid-template-columns:2fr 1fr auto">
+      <div class="fg"><label>Full Name</label><input type="text" class="sel" id="nuName" placeholder="e.g. Ramesh Kumar"></div>
+      <div class="fg"><label>Role</label><select class="sel" id="nuRole"><option value="site">Site Engineer</option><option value="admin">Admin</option></select></div>
+      <div class="fg"><label>&nbsp;</label><button class="btn btn-primary" id="nuAdd">＋ Add User</button></div>
+    </div><small style="color:var(--muted)">Site Engineers see only their own entries. Admins see everything and can manage users.</small></div></div>
+  <div class="card"><div class="card-h"><h3>Users · ${rows.length}</h3></div>
+    <div class="card-b"><div class="tbl-wrap"><table class="dt"><thead><tr><th>Name</th><th>Role</th><th>Login name (type exactly)</th><th></th></tr></thead><tbody>${
+      rows.map(u=>`<tr><td><b>${esc(u.name)}</b></td>
+        <td><span class="role-badge ${u.role==='admin'?'badge-admin':'badge-site'}">${u.role==='admin'?'ADMIN':'SITE'}</span></td>
+        <td style="color:var(--muted)">${esc(u.name)}</td>
+        <td><button class="ico-btn del" data-ru="${esc(u.name)}" title="Remove">🗑</button></td></tr>`).join('')
+    }</tbody></table></div></div></div>`;
+  $('#nuAdd').onclick=async()=>{
+    const name=$('#nuName').value,role=$('#nuRole').value;
+    $('#nuAdd').disabled=true;
+    const ok=await addUserRec(name,role);
+    $('#nuAdd').disabled=false;
+    if(ok){toast('User added','ok');renderUsers(m);}
+  };
+  $$('[data-ru]',m).forEach(b=>b.onclick=()=>confirmRemoveUser(b.dataset.ru,m));
+}
+function confirmRemoveUser(name,m){
+  const admins=USERS_DB.filter(u=>u.role==='admin');
+  const u=findUser(name);
+  if(u&&u.role==='admin'&&admins.length<=1){toast('Cannot remove the last admin','warn');return;}
+  const root=$('#modalRoot');
+  root.innerHTML=`<div class="overlay"><div class="modal confirm"><div class="modal-b">
+    <div class="c-ic">👤</div><h3>Remove ${esc(name)}?</h3>
+    <p style="color:var(--muted);margin:10px 0 22px">They will no longer be able to log in. Their existing entries stay in the records.</p>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="btn btn-ghost" id="cNo">Cancel</button>
+      <button class="btn" id="cYes" style="background:var(--danger);color:#fff">Remove</button></div></div></div></div>`;
+  const close=()=>root.innerHTML='';
+  $('#cNo').onclick=close;
+  $('#cYes').onclick=async()=>{const ok=await removeUserRec(name);close();if(ok){toast('User removed','ok');renderUsers(m);}};
 }
 
 /* ---------- EDIT MODAL (single line item) ---------- */
@@ -757,7 +972,7 @@ function renderReports(m){
       <div class="fg"><label>From date</label><input type="date" class="sel" id="flFrom"></div>
       <div class="fg"><label>To date</label><input type="date" class="sel" id="flTo"></div>
       <div class="fg"><label>Site</label><select class="sel" id="flSite"><option value="">All sites</option>${SITES.map(s=>`<option>${esc(s)}</option>`).join('')}</select></div>
-      <div class="fg"><label>Site Engineer</label><select class="sel" id="flUser"><option value="">All engineers</option>${[...ADMINS,...USERS].map(u=>`<option>${esc(u)}</option>`).join('')}</select></div>
+      <div class="fg"><label>Site Engineer</label><select class="sel" id="flUser"><option value="">All engineers</option>${engineerNames().map(u=>`<option>${esc(u)}</option>`).join('')}</select></div>
       <div class="fg"><label>BOQ Item</label><select class="sel" id="flItem"><option value="">All items</option>${BOQ.map(b=>`<option value="${esc(b.item)}">${esc(b.item)}</option>`).join('')}</select></div>
       <div class="fg"><label>Search (particular/desc/remark)</label><input type="text" class="sel" id="flText" placeholder="keyword…"></div>
     </div></div></div>
@@ -838,7 +1053,7 @@ function exportPDF(list,title){
   if(!list.length){toast('Nothing to export','warn');return;}
   if(!window.jspdf){toast('PDF library still loading…','warn');return;}
   const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape',unit:'pt',format:'a4'});
-  doc.setFontSize(15);doc.setTextColor(15,23,42);doc.text('PragatiSetu — '+title,40,38);
+  doc.setFontSize(15);doc.setTextColor(15,23,42);doc.text('DPR Tracker — '+title,40,38);
   doc.setFontSize(9);doc.setTextColor(100);doc.text('JCC Infraprojects · FOB Daily DPR · Generated '+new Date().toLocaleString('en-IN'),40,54);
   const tot=list.reduce((s,e)=>s+(+e.amount||0),0);
   const cols=['Date','Site','By','Item','Particular','Unit','Qty','Rate','Amount'];
@@ -857,9 +1072,7 @@ function boot(){
   $('#logoutBtn').addEventListener('click',logout);
   $('#hamb').addEventListener('click',()=>{$('#sidebar').classList.add('open');$('#scrim').classList.remove('hidden');});
   $('#scrim').addEventListener('click',closeSide);
-  try{const s=JSON.parse(localStorage.getItem(LS_SESSION)||'null');
-    if(s&&s.name&&[...ADMINS,...USERS].includes(s.name)){session=s;openShell();}}catch(e){}
-  initBackend();
+  initBackend();   // loads users, restores session, then entries
 }
 boot();
 </script>
